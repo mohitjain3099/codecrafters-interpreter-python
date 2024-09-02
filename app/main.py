@@ -48,6 +48,7 @@ def main():
             print("STAR * null")
         if c not in char_list:
             print("[line 1] Error: Unexpected character: "+ c)
+            exit(65)
     print("EOF  null")
 
 
