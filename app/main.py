@@ -24,6 +24,7 @@ def main():
     #     raise NotImplementedError("Scanner not implemented")
     # else:
     #     print("EOF  null") # Placeholder, remove this line when implementing the scanner
+    char_list = set('(){};,.+-*')
     for c in file_contents:
         if c == "(":
             print("LEFT_PAREN ( null")
@@ -45,6 +46,8 @@ def main():
             print("SEMICOLON ; null")
         if c == "*":
             print("STAR * null")
+        if c not in char_list:
+            print("[line 1] Error: Unexpected character: "+ c)
     print("EOF  null")
 
 
