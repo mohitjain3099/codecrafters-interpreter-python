@@ -24,33 +24,40 @@ def main():
     #     raise NotImplementedError("Scanner not implemented")
     # else:
     #     print("EOF  null") # Placeholder, remove this line when implementing the scanner
-    char_list = set('(){};,.+-*')
+    error = False
     for c in file_contents:
         if c == "(":
             print("LEFT_PAREN ( null")
-        if c == ")":
+        elif c == ")":
             print("RIGHT_PAREN ) null")
-        if c == "{":
+        elif c == "{":
             print("LEFT_BRACE { null")
-        if c == "}":
+        elif c == "}":
             print("RIGHT_BRACE } null")
-        if c == ",":
+        elif c == ",":
             print("COMMA , null")
-        if c == ".":
+        elif c == ".":
             print("DOT . null")
-        if c == "-":
+        elif c == "-":
             print("MINUS - null")
-        if c == "+":
+        elif c == "+":
             print("PLUS + null")
-        if c == ";":
+        elif c == ";":
             print("SEMICOLON ; null")
-        if c == "*":
+        elif c == "*":
             print("STAR * null")
-        if c not in char_list:
-            print("[line 1] Error: Unexpected character: "+ c)
-            exit(65)
+        else:
+            error = True
+            line_number = file_contents.count("\n", 0, file_contents.find(c)) + 1
+            print(
+                "[line %s] Error: Unexpected character: %s" % (line_number, c),
+                file=sys.stderr,
+            )
     print("EOF  null")
-
+    if error:
+        exit(65)
+    else:
+        exit(0)
 
 if __name__ == "__main__":
     main()
