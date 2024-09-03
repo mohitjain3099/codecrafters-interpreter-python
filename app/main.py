@@ -17,6 +17,12 @@ class Scanner:
         self.current = 0
         self.line = 1
         self.errors = []
+    
+    def peek(self):
+        if self.is_at_end():
+            return "\0"
+        return self.source[self.current]    
+        
     def scan_tokens(self):
         while not self.is_at_end():
             self.start = self.current
