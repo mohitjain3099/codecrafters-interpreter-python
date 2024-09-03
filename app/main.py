@@ -79,6 +79,8 @@ class Scanner:
                     self.advance()
             else:
                 self.add_token("SLASH")
+        elif char == " " or char == "\r" or char == "\t":
+            pass
         else:
             self.error(f"Unexpected character: {char}")
     def match(self, expected):
