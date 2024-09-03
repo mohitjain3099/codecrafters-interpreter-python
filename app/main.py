@@ -1,5 +1,74 @@
 import sys
 
+class Token:
+    def __init__(self, type, lexeme, literal, line):
+        self.type = type
+        self.lexeme = lexeme
+        self.literal = literal
+        self.line = line
+    def __str__(self):
+        literal_str = "null" if self.literal is None else str(self.literal)
+        return f"{self.type} {self.lexeme} {literal_str}"
+class Scanner:
+    def __init__(self, source):
+        self.source = source
+        self.tokens = []
+        self.start = 0
+        self.current = 0
+        self.line = 1
+        self.errors = []
+    def scan_tokens(self):
+        while not self.is_at_end():
+            self.start = self.current
+            self.scan_token()
+        self.tokens.append(Token("EOF", "", None, self.line))
+        return self.tokens, self.errors
+    def is_at_end(self):
+        return self.current >= len(self.source)
+    def scan_token(self):
+        char = self.advance()
+        if char == "(":
+            self.add_token("LEFT_PAREN")
+        elif char == ")":
+            self.add_token("RIGHT_PAREN")
+        elif char == "{":
+            self.add_token("LEFT_BRACE")
+        elif char == "}":
+            self.add_token("RIGHT_BRACE")
+        elif char == ",":
+            self.add_token("COMMA")
+        elif char == ".":
+            self.add_token("DOT")
+        elif char == "-":
+            self.add_token("MINUS")
+        elif char == "+":
+            self.add_token("PLUS")
+        elif char == ";":
+            self.add_token("SEMICOLON")
+        elif char == "*":
+            self.add_token("STAR")
+        elif char == "=":
+            if self.match("="):
+                self.add_token("EQUAL_EQUAL")
+            else:
+                self.add_token("EQUAL")
+        else:
+            self.error(f"Unexpected character: {char}")
+    def match(self, expected):
+        if self.is_at_end():
+            return False
+        if self.source[self.current] != expected:
+            return False
+        self.current += 1
+        return True
+    def advance(self):
+        self.current += 1
+        return self.source[self.current - 1]
+    def add_token(self, type, literal=None):
+        text = self.source[self.start : self.current]
+        self.tokens.append(Token(type, text, literal, self.line))
+    def error(self, message):
+        self.errors.append(f"[line {self.line}] Error: {message}")
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -19,50 +88,14 @@ def main():
     with open(filename) as file:
         file_contents = file.read()
 
-    # Uncomment this block to pass the first stage
-    # if file_contents:
-    #     raise NotImplementedError("Scanner not implemented")
-    # else:
-    #     print("EOF  null") # Placeholder, remove this line when implementing the scanner
-    error = False
-    for c in file_contents:
-        if c == "(":
-            print("LEFT_PAREN ( null")
-        elif c == ")":
-            print("RIGHT_PAREN ) null")
-        elif c == "{":
-            print("LEFT_BRACE { null")
-        elif c == "}":
-            print("RIGHT_BRACE } null")
-        elif c == ",":
-            print("COMMA , null")
-        elif c == ".":
-            print("DOT . null")
-        elif c == "-":
-            print("MINUS - null")
-        elif c == "+":
-            print("PLUS + null")
-        elif c == ";":
-            print("SEMICOLON ; null")
-        elif c == "*":
-            print("STAR * null")
-        elif c == "=":
-            print("EQUAL = null")
-        elif c == "==":
-            print("EQUAL_EQUAL == null")
-            
-        else:
-            error = True
-            line_number = file_contents.count("\n", 0, file_contents.find(c)) + 1
-            print(
-                "[line %s] Error: Unexpected character: %s" % (line_number, c),
-                file=sys.stderr,
-            )
-    print("EOF  null")
-    if error:
-        exit(65)
-    else:
-        exit(0)
+    scanner = Scanner(file_contents)
+    tokens, errors = scanner.scan_tokens()
+    for token in tokens:
+        print(token)
+    for error in errors:
+        print(error, file=sys.stderr)
+    if errors:
+        exit(65)  # Exit with code 65 for lexical errors
 
 if __name__ == "__main__":
     main()
