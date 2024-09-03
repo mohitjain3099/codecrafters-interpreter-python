@@ -52,6 +52,11 @@ class Scanner:
                 self.add_token("EQUAL_EQUAL")
             else:
                 self.add_token("EQUAL")
+        elif char == "!":
+            if self.match("="):
+                self.add_token("BANG_EQUAL")
+            else:
+                self.add_token("BANG")
         else:
             self.error(f"Unexpected character: {char}")
     def match(self, expected):
