@@ -59,7 +59,7 @@ def main():
             else:
                 errorcode = 65
                 error_message.append(
-                    f"[line {line_number + 1}] Error: Unexpected character: {string[count_chr]}"
+                    f"[line {line_number}] Error: Unexpected character: {string[count_chr]}"
                 )
             count_chr += 1
     token.append("EOF  null")
