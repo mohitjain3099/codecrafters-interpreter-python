@@ -55,6 +55,21 @@ def main():
                     )
             elif string[count_chr] in [" ", "\t"]:
                 pass
+            elif string[count_chr]=='"':
+                count_chr += 1
+                start = count_chr
+                while True:
+                    if string[count_chr] == '"':
+                        token.append(f"STRING \"{string[start:count_chr]}\" {string[start:count_chr]}")
+                        break
+                    elif count_chr == len(string):
+                        errorcode = 65
+                        error_message.append(
+                            f"[line {line_number+1}] Error: Unterminated string."
+                        )
+                        break
+                    count_chr += 1
+                
             else:
                 errorcode = 65
                 error_message.append(
