@@ -69,6 +69,16 @@ def main():
                         )
                         break
                     count_chr += 1
+            elif string[count_chr].isdigit():
+                start = count_chr
+                while count_chr < len(string) and string[count_chr].isdigit():
+                    count_chr += 1
+                if count_chr < len(string) and string[count_chr] == ".":
+                    count_chr += 1
+                    while count_chr < len(string) and string[count_chr].isdigit():
+                        count_chr += 1
+                token.append(f"NUMBER {string[start:count_chr]} {string[start:count_chr]}")
+                count_chr -= 1
                 
             else:
                 errorcode = 65
