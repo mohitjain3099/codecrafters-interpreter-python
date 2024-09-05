@@ -54,12 +54,11 @@ def main():
                         f"{operators[string[count_chr]]} {string[count_chr]} null"
                     )
             elif string[count_chr] in [" ", "\t"]:
-                line_number += 1
                 pass
             else:
                 errorcode = 65
                 error_message.append(
-                    f"[line {line_number}] Error: Unexpected character: {string[count_chr]}"
+                    f"[line {line_number+1}] Error: Unexpected character: {string[count_chr]}"
                 )
             count_chr += 1
     token.append("EOF  null")
