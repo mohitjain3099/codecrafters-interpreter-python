@@ -86,7 +86,7 @@ def main():
                     count_chr += 1
                 word = string[start:count_chr]
                 if word in ["and", "class", "else", "false", "for", "fun", "if", "nil", "or", "print", "return", "super", "this", "true", "var", "while"]:
-                    token.append(f"{word.upper()} null null")
+                    token.append(f"{word.upper()} {word} null")
                 else:
                     token.append(f"IDENTIFIER {word} null")
                 count_chr -= 1
