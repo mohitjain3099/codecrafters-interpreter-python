@@ -80,6 +80,7 @@ class Scanner:
             else:
                 self.add_token("SLASH")
         elif char == " " or char == "\r" or char == "\t":
+            self.line += 1
             pass
         else:
             self.error(f"Unexpected character: {char}")
