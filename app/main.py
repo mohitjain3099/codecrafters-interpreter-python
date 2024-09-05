@@ -79,7 +79,7 @@ class Scanner:
                     self.advance()
             else:
                 self.add_token("SLASH")
-        elif char == " " or char == "\r" or char == "\t":
+        elif char in [" ", "\t"]:
             self.line += 1
             pass
         else:
