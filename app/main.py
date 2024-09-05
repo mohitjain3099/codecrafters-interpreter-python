@@ -62,7 +62,7 @@ def main():
                     if string[count_chr] == '"':
                         token.append(f"STRING \"{string[start:count_chr]}\" {string[start:count_chr]}")
                         break
-                    elif count_chr == len(string):
+                    elif count_chr == len(string)-1:
                         errorcode = 65
                         error_message.append(
                             f"[line {line_number+1}] Error: Unterminated string."
