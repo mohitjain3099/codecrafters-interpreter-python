@@ -79,6 +79,17 @@ def main():
                         count_chr += 1
                 token.append(f"NUMBER {string[start:count_chr]} {float(string[start:count_chr])}")
                 count_chr -= 1
+            
+            elif string[count_chr].isalpha() or string[count_chr] == "_":
+                start = count_chr
+                while count_chr < len(string) and (string[count_chr].isalnum() or string[count_chr] == "_"):
+                    count_chr += 1
+                word = string[start:count_chr]
+                if word in ["and", "class", "else", "false", "for", "fun", "if", "nil", "or", "print", "return", "super", "this", "true", "var", "while"]:
+                    token.append(f"{word.upper()} null null")
+                else:
+                    token.append(f"IDENTIFIER {word} null")
+                count_chr -= 1
                 
             else:
                 errorcode = 65
