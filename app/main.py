@@ -286,7 +286,7 @@ def Literal(value):
         return "nil"
     return str(value).lower()
 def Unary(operator, right):
-    return f"({operator} {right})"
+    return f"({operator.name} {right})"
 class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens: list[Token] = tokens
