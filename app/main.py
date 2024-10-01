@@ -276,7 +276,11 @@ class Lexer:
 def Binary(left, operator, right):
     return {"left": left, "operator": operator, "right": right}
 def Grouping(expression):
-    return {"expression": expression}
+    if not expression:
+        global exit_code
+        exit_code = 65
+        return ""
+    return f"(group {expression})"
 def Literal(value):
     if value is None:
         return "nil"
@@ -365,6 +369,13 @@ class Parser:
             expr = self.expression()
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
+    def consume(self, token_type, message):
+        if self.check(token_type):
+            return self.advance()
+        global exit_code
+        exit_code = 65
+        print(message, file=sys.stderr)
+        exit(exit_code)
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
