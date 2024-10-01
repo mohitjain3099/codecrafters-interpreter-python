@@ -286,10 +286,6 @@ def Literal(value):
         return "nil"
     return str(value).lower()
 def Unary(operator, right):
-    if not operator or not right:
-        global exit_code
-        exit_code = 65
-        return ""
     return f"({operator.lexeme} {right})"
 class Parser:
     def __init__(self, tokens: list[Token]):
