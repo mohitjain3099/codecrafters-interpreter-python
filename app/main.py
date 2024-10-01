@@ -290,7 +290,7 @@ def Unary(operator, right):
         global exit_code
         exit_code = 65
         return ""
-    return f"({operator} {right})"
+    return f"({operator.lexeme} {right})"
 class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens: list[Token] = tokens
