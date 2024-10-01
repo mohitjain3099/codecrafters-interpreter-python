@@ -274,7 +274,7 @@ class Lexer:
                 exit_code = 65
                 return self.advance_with(Token(TOKEN_TYPE.NONE, "", ""))
 def Binary(left, operator, right):
-    return {"left": left, "operator": operator, "right": right}
+    return f"({operator.name} {left} {right})"
 def Grouping(expression):
     if not expression:
         global exit_code
