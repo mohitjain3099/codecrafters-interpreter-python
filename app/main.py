@@ -315,7 +315,8 @@ class Parser:
     def is_at_end(self) -> bool:
         return self.peek().type == TOKEN_TYPE.EOF
     def peek(self) -> Token:
-        return self.tokens[self.current]
+        if self.current < len(self.tokens):
+            return self.tokens[self.current]
     def advance(self) -> Token:
         if not self.is_at_end():
             self.current += 1
