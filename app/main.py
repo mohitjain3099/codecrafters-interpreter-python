@@ -390,9 +390,9 @@ class Parser:
         return None
     def ParseError(self, token, message):
         if token.type == TOKEN_TYPE.EOF:
-            print(f"[line {token.line}] Error at end: {message}", file=sys.stderr)
+            print(f"[line {self.current}] Error at end: {message}", file=sys.stderr)
         else:
-            print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
+            print(f"[line {self.current}] Error at '{token.name}': {message}", file=sys.stderr)
         global exit_code
         exit_code = 65
         
