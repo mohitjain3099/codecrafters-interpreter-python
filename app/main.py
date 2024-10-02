@@ -294,11 +294,7 @@ class Parser:
     def parse(self):
         ...
     def expression(self):
-        expr = self.equality()
-        if not expr:
-            self.ParseError(self.peek(), "Invalid expression syntax.")
-            return None
-        return expr
+        return self.equality()
     def equality(self):
         expr = self.comparison()
         while self.match(TOKEN_TYPE.BANG_EQUAL, TOKEN_TYPE.EQUAL_EQUAL):
@@ -343,9 +339,6 @@ class Parser:
         while self.match(TOKEN_TYPE.MINUS, TOKEN_TYPE.PLUS):
             operator = self.previous()
             right = self.factor()
-            if right is None:
-                self.ParseError(self.peek(), "Expect expression after operator.")
-                return None
             expr = Binary(expr, operator, right)
         return expr
     def factor(self):
@@ -359,9 +352,6 @@ class Parser:
         if self.match(TOKEN_TYPE.BANG, TOKEN_TYPE.MINUS):
             operator = self.previous()
             right = self.unary()
-            if right is None:
-                self.ParseError(self.peek(), "Expect expression after unary operator.")
-                return None
             return Unary(operator, right)
         return self.primary()
     def primary(self):
@@ -377,24 +367,16 @@ class Parser:
             return Literal(self.previous().value)
         if self.match(TOKEN_TYPE.LEFT_PAREN):
             expr = self.expression()
-            if not self.match(TOKEN_TYPE.RIGHT_PAREN):
-                self.ParseError(self.peek(), "Expect ')' after expression.")
-                return None  # Handle the error by returning None
-            
+            self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
-        self.ParseError(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
         if self.check(token_type):
             return self.advance()
-        self.ParseError(self.peek(), message)
-        return None
-    def ParseError(self, token, message):
-        if token.type == TOKEN_TYPE.EOF:
-            print(f"[line {self.current}] Error at end: {message}", file=sys.stderr)
-        else:
-            print(f"[line {self.current}] Error at '{token.name}': {message}", file=sys.stderr)
         global exit_code
         exit_code = 65
+        print(message, file=sys.stderr)
+        exit(exit_code)
+
         
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
