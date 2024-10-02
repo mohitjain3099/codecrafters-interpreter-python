@@ -344,7 +344,7 @@ class Parser:
     def factor(self):
         expr = self.unary()
         while self.match(TOKEN_TYPE.SLASH, TOKEN_TYPE.STAR):
-            operator = self.previous
+            operator = self.previous()
             right = self.unary()
             expr = Binary(expr, operator, right)
         return expr
