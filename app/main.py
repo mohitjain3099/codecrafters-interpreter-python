@@ -14,12 +14,8 @@ def main():
     match command:
         case "tokenize":
             scanner.print_tokens()
-            if scanner.has_errors():
-                scanner.print_errors()
-                sys.exit(65)
         case "parse":
-            if scanner.has_errors():
-                scanner.print_errors()
-                sys.exit(65)
             parser = Parser(scanner.tokens)
             expr = parser.expression()
+            if parser.has_errors():
+                parser.print_errors()
