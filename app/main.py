@@ -381,6 +381,8 @@ class Parser:
                 return self.error(self.peek(), "Expect expression.")
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
+        global exit_code
+        exit_code = 65
         return self.error(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
         if self.check(token_type):
@@ -391,8 +393,6 @@ class Parser:
         exit(exit_code)
         
     def error(self, token: Token, message: str):
-        global exit_code
-        exit_code = 65
         print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
         return None
 
