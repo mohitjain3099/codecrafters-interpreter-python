@@ -274,24 +274,40 @@ class Lexer:
                 )
                 exit_code = 65
                 return self.advance_with(Token(TOKEN_TYPE.NONE, "", "", self.line))
-def Binary(left, operator, right):
-    if not right:
-        global exit_code
-        exit_code = 65
-        return ""
-    return f"({operator.name} {left} {right})"
-def Grouping(expression):
-    if not expression:
-        global exit_code
-        exit_code = 65
-        return ""
-    return f"(group {expression})"
-def Literal(value):
-    if value is None:
-        return "nil"
-    return str(value).lower()
-def Unary(operator, right):
-    return f"({operator.name} {right})"
+    
+class Binary:
+    def __init__(self, left, operator, right):
+        self.left = left
+        self.operator = operator
+        self.right = right
+    def __str__(self):
+        return f"({self.operator.name} {self.left} {self.right})"
+    def __repr__(self):
+        return str(self)
+class Grouping:
+    def __init__(self, expression):
+        self.expression = expression
+    def __str__(self):
+        return f"(group {self.expression})"
+    def __repr__(self):
+        return str(self)
+class Literal:
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        if self.value is None:
+            return "nil"
+        return str(self.value).lower()
+    def __repr__(self):
+        return str(self)
+class Unary:
+    def __init__(self, operator, right):
+        self.operator = operator
+        self.right = right
+    def __str__(self):
+        return f"({self.operator.name} {self.right})"
+    def __repr__(self):
+        return str(self)
 
 
 
@@ -397,20 +413,43 @@ class Parser:
         return None
 
 class Interpreter():
-    def evaluate(self, expression: Parser):
-        while isinstance(expression, str) and expression.startswith('(') and expression.endswith(')'):
-            expression = expression[1:-1].strip()
-        try:
-            # Try to convert expression to float first
-            expression = float(expression)
-            
-            # Check if the float is an integer
-            if expression.is_integer():
-                return int(expression)  # Return as integer if it is a whole number
-            return expression  # Return as float otherwise
+    def evaluate(self, expression):
         
-        except (ValueError, TypeError):
-            return self.visit_grouping(expression)
+        if isinstance(expression, Literal):
+            return expression.value
+        elif isinstance(expression, Grouping):
+            return self.evaluate(expression.expression)
+        elif isinstance(expression, Unary):
+            right = self.evaluate(expression.right)
+            if expression.operator.type == TOKEN_TYPE.MINUS:
+                return -right
+            elif expression.operator.type == TOKEN_TYPE.BANG:
+                return not right
+        elif isinstance(expression, Binary):
+            left = self.evaluate(expression.left)
+            right = self.evaluate(expression.right)
+            if expression.operator.type == TOKEN_TYPE.PLUS:
+                return left + right
+            elif expression.operator.type == TOKEN_TYPE.MINUS:
+                return left - right
+            elif expression.operator.type == TOKEN_TYPE.STAR:
+                return left * right
+            elif expression.operator.type == TOKEN_TYPE.SLASH:
+                return left / right
+            elif expression.operator.type == TOKEN_TYPE.GREATER:
+                return left > right
+            elif expression.operator.type == TOKEN_TYPE.GREATER_EQUAL:
+                return left >= right
+            elif expression.operator.type == TOKEN_TYPE.LESS:
+                return left < right
+            elif expression.operator.type == TOKEN_TYPE.LESS_EQUAL:
+                return left <= right
+            elif expression.operator.type == TOKEN_TYPE.EQUAL_EQUAL:
+                return left == right
+            elif expression.operator.type == TOKEN_TYPE.BANG_EQUAL:
+                return left != right
+        return None
+        
     def visit_literal(self, literal: Literal):
         return literal
     def visit_grouping(self, grouping: Grouping):
