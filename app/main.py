@@ -301,10 +301,7 @@ class Parser:
         self.tokens: list[Token] = tokens
         self.current = 0
     def parse(self):
-        try:
-            return self.expression()
-        except Exception as e:
-            return None
+        return self.expression()
     def expression(self):
         return self.equality()
     def equality(self):
@@ -444,9 +441,6 @@ def main():
             expression = par.parse()
             if expression:
                 print(expression)
-            else:
-                global exit_code
-                exit_code = 65
         elif command == "evaluate":
             lex = Lexer(file_contents)
             tokens = []
