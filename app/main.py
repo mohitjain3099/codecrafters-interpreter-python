@@ -230,7 +230,7 @@ class Lexer:
                 if self.peek().type == TOKEN_TYPE.SLASH:
                     while self.i < self.size and self.c != "\n":
                         self.advance()
-                    return Token(TOKEN_TYPE.NONE, "", "")
+                    return Token(TOKEN_TYPE.NONE, "", "", self.line)
                 else:
                     return self.advance_with(Token(TOKEN_TYPE.SLASH, "/", "null", self.line))
             case "=":
