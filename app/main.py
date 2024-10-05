@@ -372,6 +372,8 @@ class Parser:
             return Literal(self.previous().value)
         if self.match(TOKEN_TYPE.LEFT_PAREN):
             expr = self.expression()
+            if not expr:
+                return self.error(self.peek(), "Expect expression.")
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
         return self.error(self.peek(), "Expect expression.")
