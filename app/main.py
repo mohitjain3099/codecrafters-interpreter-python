@@ -416,7 +416,7 @@ def main():
         exit(1)
     command: str = sys.argv[1]
     filename: str = sys.argv[2]
-    commands = ["tokenize", "parse"]
+    commands = ["tokenize", "parse", "evaluate"]
     if command not in commands:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
