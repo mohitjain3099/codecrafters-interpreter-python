@@ -410,18 +410,11 @@ class Interpreter():
             return expression  # Return as float otherwise
         
         except (ValueError, TypeError):
-        
-            # If expression is not a number, it is a string
-            if expression == "group true":
-                return 'true'
-            elif expression == "group false":
-                return 'false'
-
-            return expression
+            return self.visit_grouping(expression)
     def visit_literal(self, literal: Literal):
         return literal
     def visit_grouping(self, grouping: Grouping):
-        return grouping
+        return self.evaluate(grouping.expression)
     def visit_unary(self, unary: Unary):
         raise NotImplementedError()
     def visit_binary(self, binary: Binary):
