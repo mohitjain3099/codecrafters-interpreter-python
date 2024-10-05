@@ -398,6 +398,8 @@ class Parser:
 
 class Interpreter():
     def evaluate(self, expression: Parser):
+        while isinstance(expression, str) and expression.startswith('(') and expression.endswith(')'):
+            expression = expression[1:-1].strip()
         try:
             # Try to convert expression to float first
             expression = float(expression)
