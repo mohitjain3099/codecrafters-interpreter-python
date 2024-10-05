@@ -292,6 +292,10 @@ def Literal(value):
     return str(value).lower()
 def Unary(operator, right):
     return f"({operator.name} {right})"
+
+
+
+
 class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens: list[Token] = tokens
@@ -397,9 +401,9 @@ class Parser:
 
 class Interpreter():
     def evaluate(self, expression: Parser):
-        return expression.visit(self)
+        return expression
     def visit_literal(self, literal: Literal):
-        return literal.value
+        return literal
     def visit_grouping(self, grouping: Grouping):
         raise NotImplementedError()
     def visit_unary(self, unary: Unary):
