@@ -464,9 +464,6 @@ def main():
                 elif isinstance(value, bool):
                     value = str(value).lower()
                 print(value)
-            else:
-                global exit_code
-                exit_code = 65
             
 if __name__ == "__main__":
     main()
