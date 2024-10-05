@@ -460,7 +460,9 @@ def main():
                     value = "nil"
                 elif isinstance(value, bool):
                     value = str(value).lower()
-            print(value)
+                print(value)
+            else:
+                exit(65)
             
 if __name__ == "__main__":
     main()
