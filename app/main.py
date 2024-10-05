@@ -395,6 +395,18 @@ class Parser:
         print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
         return None
 
+class Interpreter(Parser):
+    def evaluate(self, expression: Parser):
+        return expression.visit(self)
+    def visit_literal(self, literal: Literal):
+        return literal.value
+    def visit_grouping(self, grouping: Grouping):
+        raise NotImplementedError()
+    def visit_unary(self, unary: Unary):
+        raise NotImplementedError()
+    def visit_binary(self, binary: Binary):
+        raise NotImplementedError()
+
         
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -428,6 +440,23 @@ def main():
             expression = par.parse()
             if expression:
                 print(expression)
-    exit(exit_code)
+        elif command == "evaluate":
+            lex = Lexer(file_contents)
+            tokens = []
+            while lex.i <= lex.size:
+                token = lex.next_token()
+                if token.type != TOKEN_TYPE.NONE:
+                    tokens.append(token)
+            par = Parser(tokens)
+            expression = par.parse()
+            if expression:
+                interpreter = Interpreter()
+                value = interpreter.evaluate(expression)
+                if value is None:
+                    value = "nil"
+                elif isinstance(value, bool):
+                    value = str(value).lower()
+            print(value)
+            
 if __name__ == "__main__":
     main()
