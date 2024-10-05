@@ -398,11 +398,15 @@ class Parser:
 
 class Interpreter():
     def evaluate(self, expression: Parser):
+        if int(expression) == expression:
+            return int(expression)
+        elif float(expression) == expression:
+            return float(expression)
         return expression
     def visit_literal(self, literal: Literal):
         return literal
     def visit_grouping(self, grouping: Grouping):
-        raise NotImplementedError()
+        return grouping
     def visit_unary(self, unary: Unary):
         raise NotImplementedError()
     def visit_binary(self, binary: Binary):
