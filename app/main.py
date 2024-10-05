@@ -398,10 +398,10 @@ class Parser:
 
 class Interpreter():
     def evaluate(self, expression: Parser):
-        if int(expression) == expression:
-            return int(expression)
-        elif float(expression) == expression:
+        if float(expression) == expression:
             return float(expression)
+        elif int(expression) == expression:
+            return int(expression)
         return expression
     def visit_literal(self, literal: Literal):
         return literal
