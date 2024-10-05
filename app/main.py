@@ -46,10 +46,11 @@ class TOKEN_TYPE(Enum):
     def __str__(self):
         return self.name
 class Token:
-    def __init__(self, type: TOKEN_TYPE, name: str, value):
+    def __init__(self, type: TOKEN_TYPE, name: str, value, line: int):
         self.type = type
         self.name = name
         self.value = value
+        self.line = line
     def __str__(self):
         return f"{str(self.type)} {self.name} {self.value}"
     def __repr__(self):
@@ -85,37 +86,37 @@ class Lexer:
         self.skip_whitespace()
         match self.c:
             case self.c if self.i >= self.size:
-                next = Token(TOKEN_TYPE.EOF, "", "null")
+                next = Token(TOKEN_TYPE.EOF, "", "null", self.line)
             case "(":
-                next = self.advance_with(Token(TOKEN_TYPE.LEFT_PAREN, "(", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.LEFT_PAREN, "(", "null", self.line))
             case ")":
-                next = self.advance_with(Token(TOKEN_TYPE.RIGHT_PAREN, ")", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.RIGHT_PAREN, ")", "null", self.line))
             case "{":
-                next = self.advance_with(Token(TOKEN_TYPE.LEFT_BRACE, "{", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.LEFT_BRACE, "{", "null", self.line))
             case "}":
-                next = self.advance_with(Token(TOKEN_TYPE.RIGHT_BRACE, "}", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.RIGHT_BRACE, "}", "null", self.line))
             case ",":
-                next = self.advance_with(Token(TOKEN_TYPE.COMMA, ",", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.COMMA, ",", "null", self.line))
             case ".":
-                next = self.advance_with(Token(TOKEN_TYPE.DOT, ".", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.DOT, ".", "null", self.line))
             case "-":
-                next = self.advance_with(Token(TOKEN_TYPE.MINUS, "-", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.MINUS, "-", "null", self.line))
             case "+":
-                next = self.advance_with(Token(TOKEN_TYPE.PLUS, "+", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.PLUS, "+", "null", self.line))
             case ";":
-                next = self.advance_with(Token(TOKEN_TYPE.SEMICOLON, ";", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.SEMICOLON, ";", "null", self.line))
             case "*":
-                next = self.advance_with(Token(TOKEN_TYPE.STAR, "*", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.STAR, "*", "null", self.line))
             case "/":
-                next = self.advance_with(Token(TOKEN_TYPE.SLASH, "/", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.SLASH, "/", "null", self.line))
             case "=":
-                next = self.advance_with(Token(TOKEN_TYPE.EQUAL, "=", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.EQUAL, "=", "null", self.line))
             case "!":
-                next = self.advance_with(Token(TOKEN_TYPE.BANG, "!", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.BANG, "!", "null", self.line))
             case "<":
-                next = self.advance_with(Token(TOKEN_TYPE.LESS, "<", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.LESS, "<", "null", self.line))
             case ">":
-                next = self.advance_with(Token(TOKEN_TYPE.GREATER, ">", "null"))
+                next = self.advance_with(Token(TOKEN_TYPE.GREATER, ">", "null", self.line))
             case '"':
                 next = self.next_string()
             case "_":
@@ -126,7 +127,7 @@ class Lexer:
                 if self.c.isdigit():
                     next = self.next_number()
                 else:
-                    next = self.advance_with(Token(TOKEN_TYPE.NONE, "", ""))
+                    next = self.advance_with(Token(TOKEN_TYPE.NONE, "", "", self.line))
         self.i = i
         self.c = c
         return next
@@ -137,38 +138,38 @@ class Lexer:
             self.advance()
         match i:
             case "and":
-                return Token(TOKEN_TYPE.AND, i, "null")
+                return Token(TOKEN_TYPE.AND, i, "null", self.line)
             case "or":
-                return Token(TOKEN_TYPE.OR, i, "null")
+                return Token(TOKEN_TYPE.OR, i, "null", self.line)
             case "if":
-                return Token(TOKEN_TYPE.IF, i, "null")
+                return Token(TOKEN_TYPE.IF, i, "null", self.line)
             case "else":
-                return Token(TOKEN_TYPE.ELSE, i, "null")
+                return Token(TOKEN_TYPE.ELSE, i, "null", self.line)
             case "for":
-                return Token(TOKEN_TYPE.FOR, i, "null")
+                return Token(TOKEN_TYPE.FOR, i, "null", self.line)
             case "while":
-                return Token(TOKEN_TYPE.WHILE, i, "null")
+                return Token(TOKEN_TYPE.WHILE, i, "null", self.line)
             case "true":
-                return Token(TOKEN_TYPE.TRUE, i, "null")
+                return Token(TOKEN_TYPE.TRUE, i, "null", self.line)
             case "false":
-                return Token(TOKEN_TYPE.FALSE, i, "null")
+                return Token(TOKEN_TYPE.FALSE, i, "null", self.line)
             case "class":
-                return Token(TOKEN_TYPE.CLASS, i, "null")
+                return Token(TOKEN_TYPE.CLASS, i, "null", self.line)
             case "super":
-                return Token(TOKEN_TYPE.SUPER, i, "null")
+                return Token(TOKEN_TYPE.SUPER, i, "null", self.line)
             case "this":
-                return Token(TOKEN_TYPE.THIS, i, "null")
+                return Token(TOKEN_TYPE.THIS, i, "null", self.line)
             case "var":
-                return Token(TOKEN_TYPE.VAR, i, "null")
+                return Token(TOKEN_TYPE.VAR, i, "null", self.line)
             case "fun":
-                return Token(TOKEN_TYPE.FUN, i, "null")
+                return Token(TOKEN_TYPE.FUN, i, "null", self.line)
             case "return":
-                return Token(TOKEN_TYPE.RETURN, i, "null")
+                return Token(TOKEN_TYPE.RETURN, i, "null", self.line)
             case "print":
-                return Token(TOKEN_TYPE.PRINT, i, "null")
+                return Token(TOKEN_TYPE.PRINT, i, "null", self.line)
             case "nil":
-                return Token(TOKEN_TYPE.NIL, i, "null")
-        return Token(TOKEN_TYPE.IDENTIFIER, i, "null")
+                return Token(TOKEN_TYPE.NIL, i, "null", self.line)
+        return Token(TOKEN_TYPE.IDENTIFIER, i, "null", self.line)
     def next_string(self) -> Token:
         global exit_code
         s = ""
@@ -181,8 +182,8 @@ class Lexer:
                     f"[line {self.line}] Error: Unterminated string.", file=sys.stderr
                 )
                 exit_code = 65
-                return self.advance_with(Token(TOKEN_TYPE.STRING, "", ""))
-        return self.advance_with(Token(TOKEN_TYPE.STRING, f'"{s}"', s))
+                return self.advance_with(Token(TOKEN_TYPE.STRING, "", "", self.line))
+        return self.advance_with(Token(TOKEN_TYPE.STRING, f'"{s}"', s, self.line))
     def next_number(self) -> Token:
         dot: bool = False
         n: str = ""
@@ -197,69 +198,69 @@ class Lexer:
             n += self.c
             self.advance()
         value: float = float(n)
-        return Token(TOKEN_TYPE.NUMBER, n, value)
+        return Token(TOKEN_TYPE.NUMBER, n, value, self.line)
     def next_token(self) -> Token:
         self.skip_whitespace()
         if self.i >= self.size:
             self.advance()
-            return Token(TOKEN_TYPE.EOF, "", "null")
+            return Token(TOKEN_TYPE.EOF, "", "null", self.line)
         global exit_code
         match self.c:
             case "(":
-                return self.advance_with(Token(TOKEN_TYPE.LEFT_PAREN, "(", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.LEFT_PAREN, "(", "null", self.line))
             case ")":
-                return self.advance_with(Token(TOKEN_TYPE.RIGHT_PAREN, ")", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.RIGHT_PAREN, ")", "null", self.line))
             case "{":
-                return self.advance_with(Token(TOKEN_TYPE.LEFT_BRACE, "{", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.LEFT_BRACE, "{", "null",  self.line))
             case "}":
-                return self.advance_with(Token(TOKEN_TYPE.RIGHT_BRACE, "}", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.RIGHT_BRACE, "}", "null", self.line))
             case ",":
-                return self.advance_with(Token(TOKEN_TYPE.COMMA, ",", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.COMMA, ",", "null", self.line))
             case ".":
-                return self.advance_with(Token(TOKEN_TYPE.DOT, ".", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.DOT, ".", "null", self.line))
             case "-":
-                return self.advance_with(Token(TOKEN_TYPE.MINUS, "-", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.MINUS, "-", "null", self.line))
             case "+":
-                return self.advance_with(Token(TOKEN_TYPE.PLUS, "+", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.PLUS, "+", "null", self.line))
             case ";":
-                return self.advance_with(Token(TOKEN_TYPE.SEMICOLON, ";", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.SEMICOLON, ";", "null", self.line))
             case "*":
-                return self.advance_with(Token(TOKEN_TYPE.STAR, "*", "null"))
+                return self.advance_with(Token(TOKEN_TYPE.STAR, "*", "null", self.line))
             case "/":
                 if self.peek().type == TOKEN_TYPE.SLASH:
                     while self.i < self.size and self.c != "\n":
                         self.advance()
                     return Token(TOKEN_TYPE.NONE, "", "")
                 else:
-                    return self.advance_with(Token(TOKEN_TYPE.SLASH, "/", "null"))
+                    return self.advance_with(Token(TOKEN_TYPE.SLASH, "/", "null", self.line))
             case "=":
                 if self.peek().type == TOKEN_TYPE.EQUAL:
                     self.advance()
                     return self.advance_with(
-                        Token(TOKEN_TYPE.EQUAL_EQUAL, "==", "null")
+                        Token(TOKEN_TYPE.EQUAL_EQUAL, "==", "null", self.line)
                     )
                 else:
-                    return self.advance_with(Token(TOKEN_TYPE.EQUAL, "=", "null"))
+                    return self.advance_with(Token(TOKEN_TYPE.EQUAL, "=", "null", self.line))
             case "!":
                 if self.peek().type == TOKEN_TYPE.EQUAL:
                     self.advance()
-                    return self.advance_with(Token(TOKEN_TYPE.BANG_EQUAL, "!=", "null"))
+                    return self.advance_with(Token(TOKEN_TYPE.BANG_EQUAL, "!=", "null", self.line))
                 else:
-                    return self.advance_with(Token(TOKEN_TYPE.BANG, "!", "null"))
+                    return self.advance_with(Token(TOKEN_TYPE.BANG, "!", "null", self.line))
             case "<":
                 if self.peek().type == TOKEN_TYPE.EQUAL:
                     self.advance()
-                    return self.advance_with(Token(TOKEN_TYPE.LESS_EQUAL, "<=", "null"))
+                    return self.advance_with(Token(TOKEN_TYPE.LESS_EQUAL, "<=", "null", self.line))
                 else:
-                    return self.advance_with(Token(TOKEN_TYPE.LESS, "<", "null"))
+                    return self.advance_with(Token(TOKEN_TYPE.LESS, "<", "null", self.line))
             case ">":
                 if self.peek().type == TOKEN_TYPE.EQUAL:
                     self.advance()
                     return self.advance_with(
-                        Token(TOKEN_TYPE.GREATER_EQUAL, ">=", "null")
+                        Token(TOKEN_TYPE.GREATER_EQUAL, ">=", "null", self.line)
                     )
                 else:
-                    return self.advance_with(Token(TOKEN_TYPE.GREATER, ">", "null"))
+                    return self.advance_with(Token(TOKEN_TYPE.GREATER, ">", "null", self.line))
             case '"':
                 return self.next_string()
             case _:
@@ -272,7 +273,7 @@ class Lexer:
                     file=sys.stderr,
                 )
                 exit_code = 65
-                return self.advance_with(Token(TOKEN_TYPE.NONE, "", ""))
+                return self.advance_with(Token(TOKEN_TYPE.NONE, "", "", self.line))
 def Binary(left, operator, right):
     return f"({operator.name} {left} {right})"
 def Grouping(expression):
@@ -292,7 +293,10 @@ class Parser:
         self.tokens: list[Token] = tokens
         self.current = 0
     def parse(self):
-        ...
+        try:
+            return self.expression()
+        except Exception as e:
+            return None
     def expression(self):
         return self.equality()
     def equality(self):
@@ -370,6 +374,7 @@ class Parser:
             expr = self.expression()
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
+        return self.error(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
         if self.check(token_type):
             return self.advance()
@@ -377,6 +382,12 @@ class Parser:
         exit_code = 65
         print(message, file=sys.stderr)
         exit(exit_code)
+        
+    def error(self, token: Token, message: str):
+        global exit_code
+        exit_code = 65
+        print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
+        return None
 
         
 def main():
@@ -395,7 +406,7 @@ def main():
         file_contents = file.read()
         if command == "tokenize":
             lex = Lexer(file_contents)
-            token: Token = Token(TOKEN_TYPE.NONE, "", "")
+            token: Token = Token(TOKEN_TYPE.NONE, "", "", 0)
             while token.type != TOKEN_TYPE.EOF:
                 token = lex.next_token()
                 if token.type != TOKEN_TYPE.NONE:
@@ -404,10 +415,13 @@ def main():
             lex = Lexer(file_contents)
             tokens = []
             while lex.i <= lex.size:
-                tokens.append(lex.next_token())
+                token = lex.next_token()
+                if token.type != TOKEN_TYPE.NONE:
+                    tokens.append(token)
             par = Parser(tokens)
-            expression = par.expression()
-            print(expression)
+            expression = par.parse()
+            if expression:
+                print(expression)
     exit(exit_code)
 if __name__ == "__main__":
     main()
