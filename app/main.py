@@ -458,6 +458,11 @@ def main():
                 elif isinstance(value, bool):
                     value = str(value).lower()
                 print(value)
+    if exit_code != 0:
+            sys.exit(exit_code)  # Exit with error code
+
+    # Default success exit
+    sys.exit(0)
             
 if __name__ == "__main__":
     main()
