@@ -462,7 +462,8 @@ def main():
                     value = str(value).lower()
                 print(value)
             else:
-                exit(65)
+                global exit_code
+                exit_code = 65
             
 if __name__ == "__main__":
     main()
