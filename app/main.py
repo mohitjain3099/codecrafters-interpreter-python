@@ -417,14 +417,16 @@ class Interpreter():
         
         if isinstance(expression, Literal):
             while isinstance(expression, str) and expression.startswith('(') and expression.endswith(')'):
-                expression = expression[1:-1].strip()
+                expression.value = expression.value[1:-1].strip()
             
             try:
-                expression = float(expression)
-                if expression.is_integer():
-                    expression = int(expression)
-            except:
+                expression.value = float(expression.value)
+                if expression.value.is_integer():
+                    expression.value = int(expression.value)
                 return expression.value
+            except:
+                pass
+            return expression.value
               
         elif isinstance(expression, Grouping):
             return self.evaluate(expression.expression)
