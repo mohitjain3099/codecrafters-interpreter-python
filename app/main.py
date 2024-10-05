@@ -182,7 +182,7 @@ class Lexer:
                     f"[line {self.line}] Error: Unterminated string.", file=sys.stderr
                 )
                 exit_code = 65
-                return self.advance_with(Token(TOKEN_TYPE.STRING, "", "", self.line))
+                return self.advance_with(Token(TOKEN_TYPE.EOF, "", "null", self.line))
         return self.advance_with(Token(TOKEN_TYPE.STRING, f'"{s}"', s, self.line))
     def next_number(self) -> Token:
         dot: bool = False
