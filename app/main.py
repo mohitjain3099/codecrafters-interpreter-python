@@ -395,7 +395,7 @@ class Parser:
         print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
         return None
 
-class Interpreter(Parser):
+class Interpreter():
     def evaluate(self, expression: Parser):
         return expression.visit(self)
     def visit_literal(self, literal: Literal):
