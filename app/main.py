@@ -444,6 +444,9 @@ def main():
             expression = par.parse()
             if expression:
                 print(expression)
+            else:
+                global exit_code
+                exit_code = 65
         elif command == "evaluate":
             lex = Lexer(file_contents)
             tokens = []
