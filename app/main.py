@@ -398,12 +398,18 @@ class Parser:
 
 class Interpreter():
     def evaluate(self, expression: Parser):
-        if float(expression) == expression:
+        try:
+            # Try to convert expression to float first
             expression = float(expression)
-            if int(expression) == expression:
-                return int(expression)
-            return float(expression)
-        return expression
+            
+            # Check if the float is an integer
+            if expression.is_integer():
+                return int(expression)  # Return as integer if it is a whole number
+            return expression  # Return as float otherwise
+        
+        except (ValueError, TypeError):
+            # If conversion to float fails, return the original expression
+            return expression
     def visit_literal(self, literal: Literal):
         return literal
     def visit_grouping(self, grouping: Grouping):
