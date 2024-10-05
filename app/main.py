@@ -410,7 +410,13 @@ class Interpreter():
             return expression  # Return as float otherwise
         
         except (ValueError, TypeError):
-            # If conversion to float fails, return the original expression
+        
+            # If expression is not a number, it is a string
+            if expression == "group true":
+                return 'true'
+            elif expression == "group false":
+                return 'false'
+
             return expression
     def visit_literal(self, literal: Literal):
         return literal
