@@ -410,7 +410,7 @@ class Parser:
         
     def error(self, token: Token, message: str):
         print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
-        return None
+        return ""
 
 class Interpreter():
     def evaluate(self, expression):
