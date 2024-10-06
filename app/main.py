@@ -415,9 +415,9 @@ class Parser:
 class Interpreter():
     def evaluate(self, expression):
         if isinstance(expression, Literal):
-            if isinstance(expression.value, bool):
+            if isinstance(expression.value, bool) or isinstance(expression.value, str):
                 return expression.value
-            if expression.value.is_integer():
+            elif expression.value.is_integer():
                 return int(expression.value)
             return expression.value
         elif isinstance(expression, Grouping):
