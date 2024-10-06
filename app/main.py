@@ -293,14 +293,13 @@ class Grouping:
         return str(self)
 class Literal:
     def __init__(self, value):
-        if bool(value) == value:
-            self.value = value
-        elif float(value) == value:
+        try:
+            value = float(value)
             if value.is_integer():
-                self.value = int(value)
-            self.value = float(value)
-        else:
-            self.value = value
+                value = int(value)
+        except ValueError:
+            pass
+        self.value = value
     def __str__(self):
         if self.value is None:
             return "nil"
