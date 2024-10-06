@@ -442,7 +442,6 @@ class Parser:
         return None
 class Interpreter:
     def evaluate(self, expression: Parser):
-        return expression
         try:
             # Try to convert expression to float first
             expression = float(expression)
