@@ -281,6 +281,10 @@ class Binary:
         self.operator = operator
         self.right = right
     def __str__(self):
+        if not self.right:
+            global exit_code
+            exit_code = 65
+            return ""
         return f"({self.operator.name} {self.left} {self.right})"
     def __repr__(self):
         return str(self)
@@ -368,24 +372,21 @@ class Parser:
         ):
             operator = self.previous()
             right = self.term()
-            if right is not None:
-                expr = Binary(expr, operator, right)
+            expr = Binary(expr, operator, right)
         return expr
     def term(self):
         expr = self.factor()
         while self.match(TOKEN_TYPE.MINUS, TOKEN_TYPE.PLUS):
             operator = self.previous()
             right = self.factor()
-            if right is not None:
-                expr = Binary(expr, operator, right)
+            expr = Binary(expr, operator, right)
         return expr
     def factor(self):
         expr = self.unary()
         while self.match(TOKEN_TYPE.SLASH, TOKEN_TYPE.STAR):
             operator = self.previous()
             right = self.unary()
-            if right is not None:
-                expr = Binary(expr, operator, right)
+            expr = Binary(expr, operator, right)
         return expr
     def unary(self):
         if self.match(TOKEN_TYPE.BANG, TOKEN_TYPE.MINUS):
