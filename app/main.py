@@ -415,6 +415,8 @@ class Parser:
         
     def error(self, token: Token, message: str):
         print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
+        global exit_code
+        exit_code = 65
         return None
 
 class Interpreter():
@@ -471,6 +473,8 @@ class Interpreter():
 
         
 def main():
+    global exit_code
+    exit_code = 0
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
     if len(sys.argv) < 3:
@@ -519,11 +523,8 @@ def main():
                 elif isinstance(value, bool):
                     value = str(value).lower()
                 print(value)
-    if exit_code != 0:
-            sys.exit(exit_code)  # Exit with error code
-
-    # Default success exit
-    sys.exit(0)
+    
+    sys.exit(exit_code)
             
 if __name__ == "__main__":
     main()
