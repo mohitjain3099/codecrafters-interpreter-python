@@ -442,12 +442,22 @@ class Parser:
         return None
 class Interpreter:
     def evaluate(self, expression: Parser):
+        if expression.startswith("(group "):
+            # Remove the "(group " prefix and ")" suffix
+            inner_expression = expression[7:-1].strip()
+            return self.evaluate(inner_expression)
+        elif expression == "true":
+            return True
+        elif expression == "false":
+            return False
+        elif expression == "nil":
+            return None
         try:
             # Try to convert expression to float first
             value = float(expression)
-            # Check if the float is actually an integer
+            # Check if the float is an integer
             if value.is_integer():
-                return int(value)  # Return as integer if it's a whole number
+                return int(value)  # Return as integer if it is a whole number
             return value  # Return as float otherwise
         except ValueError:
             # If conversion to float fails, return the original expression
