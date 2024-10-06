@@ -417,6 +417,8 @@ class Interpreter():
         if isinstance(expression, Literal):
             if isinstance(expression.value, bool) or isinstance(expression.value, str):
                 return expression.value
+            elif expression.value is None:
+                return None
             elif expression.value.is_integer():
                 return int(expression.value)
             return expression.value
