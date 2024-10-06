@@ -444,23 +444,19 @@ class Interpreter:
     def evaluate(self, expression: Parser):
         try:
             # Try to convert expression to float first
-            expression = float(expression)
-            # Check if the float is an integer
-            if expression.is_integer():
-                return int(expression)  # Return as integer if it is a whole number
-            return expression  # Return as float otherwise
-        except (ValueError, TypeError):
+            value = float(expression)
+            # Check if the float is actually an integer
+            if value.is_integer():
+                return int(value)  # Return as integer if it's a whole number
+            return value  # Return as float otherwise
+        except ValueError:
             # If conversion to float fails, return the original expression
-            if expression.startswith("(group") and expression.endswith(')'):
-                expr = expression[7:-1]
-                return expr
             return expression
             
     def visit_literal(self, literal: Literal):
         return literal
     def visit_grouping(self, grouping: Grouping):
         raise NotImplementedError()
-        return grouping
     def visit_unary(self, unary: Unary):
         raise NotImplementedError()
     def visit_binary(self, binary: Binary):
