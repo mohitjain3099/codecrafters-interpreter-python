@@ -281,8 +281,8 @@ class Binary:
         self.operator = operator
         self.right = right
     def __str__(self):
-        if self.right is None:
-            return None
+        if self.right=="":
+            return ""
         return f"({self.operator.name} {self.left} {self.right})"
     def __repr__(self):
         return str(self)
@@ -290,7 +290,7 @@ class Grouping:
     def __init__(self, expression):
         self.expression = expression
     def __str__(self):
-        if self.expression is None:
+        if self.expression=="":
             return ""
         return f"(group {self.expression})"
     def __repr__(self):
