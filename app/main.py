@@ -407,14 +407,9 @@ class Parser:
         if self.match(TOKEN_TYPE.LEFT_PAREN):
             if self.check(TOKEN_TYPE.RIGHT_PAREN):
                 self.advance()
-                return Grouping(None)
+                return None
             expr = self.expression()
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
-            if isinstance(expr,str):
-                while expr.startswith('"') and expr.endswith('"'):
-                    expr = expr[1:-1]
-            if expr is None:
-                return Grouping(None)
             return Grouping(expr)
 
         return self.error(self.peek(), "Expect expression.")
