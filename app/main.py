@@ -414,8 +414,8 @@ class Parser:
             if isinstance(expr,str):
                 while expr.startswith('"') and expr.endswith('"'):
                     expr = expr[1:-1]
-            if expr is not None or expr != "":
-                return Grouping(expr)
+            print(expr)
+            return Grouping(expr)
 
         return self.error(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
