@@ -441,8 +441,18 @@ class Parser:
         )
         return None
 class Interpreter:
-    def evaluate(self, expression: Parser):
-        if expression.startswith("(group "):
+    def evaluate(self, expression: str):
+        if expression.startswith("(- "):
+            # Handle negation
+            inner_expression = expression[3:-1].strip()
+            value = self.evaluate(inner_expression)
+            return -value
+        elif expression.startswith("(! "):
+            # Handle logical not
+            inner_expression = expression[3:-1].strip()
+            value = self.evaluate(inner_expression)
+            return not value
+        elif expression.startswith("(group "):
             # Remove the "(group " prefix and ")" suffix
             inner_expression = expression[7:-1].strip()
             return self.evaluate(inner_expression)
