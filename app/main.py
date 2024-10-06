@@ -281,8 +281,6 @@ class Binary:
         self.operator = operator
         self.right = right
     def __str__(self):
-        if self.right is None:
-            return ""
         return f"({self.operator.name} {self.left} {self.right})"
     def __repr__(self):
         return str(self)
@@ -290,9 +288,7 @@ class Grouping:
     def __init__(self, expression):
         self.expression = expression
     def __str__(self):
-        if self.expression.startswith("(") and self.expression.endswith(")"):
-            return self.expression[1:-1]
-        return f"({self.expression})"
+        return f"(group {self.expression})"
     def __repr__(self):
         return str(self)
 class Literal:
@@ -372,21 +368,24 @@ class Parser:
         ):
             operator = self.previous()
             right = self.term()
-            expr = Binary(expr, operator, right)
+            if right is not None:
+                expr = Binary(expr, operator, right)
         return expr
     def term(self):
         expr = self.factor()
         while self.match(TOKEN_TYPE.MINUS, TOKEN_TYPE.PLUS):
             operator = self.previous()
             right = self.factor()
-            expr = Binary(expr, operator, right)
+            if right is not None:
+                expr = Binary(expr, operator, right)
         return expr
     def factor(self):
         expr = self.unary()
         while self.match(TOKEN_TYPE.SLASH, TOKEN_TYPE.STAR):
             operator = self.previous()
             right = self.unary()
-            expr = Binary(expr, operator, right)
+            if right is not None:
+                expr = Binary(expr, operator, right)
         return expr
     def unary(self):
         if self.match(TOKEN_TYPE.BANG, TOKEN_TYPE.MINUS):
@@ -412,6 +411,9 @@ class Parser:
                 return None
             expr = self.expression()
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
+            if isinstance(expr,str):
+                while expr.startswith('"') and expr.endswith('"'):
+                    expr = expr[1:-1]
             return Grouping(expr)
 
         return self.error(self.peek(), "Expect expression.")
