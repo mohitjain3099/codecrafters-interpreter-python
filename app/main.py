@@ -416,15 +416,6 @@ class Interpreter():
     def evaluate(self, expression):
         
         if isinstance(expression, Literal):
-            while isinstance(expression.value, str) and expression.value.startswith('(') and expression.value.endswith(')'):
-                expression.value = expression.value[1:-1].strip()
-            if expression.value.type == TOKEN_TYPE.STRING:
-                return expression.value
-            if expression.value.type == TOKEN_TYPE.NUMBER:
-                expression.value = float(expression.value)
-                if expression.value.is_integer():
-                    expression.value = int(expression.value)
-                return expression.value
             return expression.value
         elif isinstance(expression, Grouping):
             return self.evaluate(expression.expression)
