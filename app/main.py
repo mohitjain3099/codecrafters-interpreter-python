@@ -290,6 +290,8 @@ class Grouping:
     def __init__(self, expression):
         self.expression = expression
     def __str__(self):
+        if self.expression.startswith("(") and self.expression.endswith(")"):
+            return self.expression[1:-1]
         return f"({self.expression})"
     def __repr__(self):
         return str(self)
