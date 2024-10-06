@@ -295,9 +295,9 @@ class Literal:
     def __init__(self, value):
         if bool(value) == value:
             self.value = value
-        elif float(value).is_integer():
-            self.value = int(value)
         elif float(value) == value:
+            if value.is_integer():
+                self.value = int(value)
             self.value = float(value)
         else:
             self.value = value
