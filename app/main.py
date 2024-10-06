@@ -293,7 +293,7 @@ class Grouping:
         self.expression = expression
     def __str__(self):
         if self.expression is None:
-            return "nil"
+            return ""
         return f"(group {self.expression})"
     def __repr__(self):
         return str(self)
@@ -406,15 +406,15 @@ class Parser:
             return Literal(self.previous().value)
         if self.match(TOKEN_TYPE.LEFT_PAREN):
             if self.check(TOKEN_TYPE.RIGHT_PAREN):
-                self.error(self.peek(), "Expect expression.")
-                self.advance()  # Consume the right parenthesis
-                return None
+                self.advance()
+                return Grouping(None)
             expr = self.expression()
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             if isinstance(expr,str):
                 while expr.startswith('"') and expr.endswith('"'):
                     expr = expr[1:-1]
-            print(expr)
+            if expr is None:
+                return Grouping(None)
             return Grouping(expr)
 
         return self.error(self.peek(), "Expect expression.")
