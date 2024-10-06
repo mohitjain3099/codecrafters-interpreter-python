@@ -290,8 +290,6 @@ class Grouping:
     def __init__(self, expression):
         self.expression = expression
     def __str__(self):
-        if self.expression is None:
-            return ""
         return f"(group {self.expression})"
     def __repr__(self):
         return str(self)
@@ -321,7 +319,11 @@ class Parser:
         self.tokens: list[Token] = tokens
         self.current = 0
     def parse(self):
-        return self.expression()
+        try:
+            return self.expression()
+        except Exception as e:
+            print(f"Error: {str(e)}", file=sys.stderr)
+            return None
     def expression(self):
         return self.equality()
     def equality(self):
@@ -401,8 +403,7 @@ class Parser:
                 return self.error(self.peek(), "Expect expression.")
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
-        global exit_code
-        exit_code = 65
+
         return self.error(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
         if self.check(token_type):
