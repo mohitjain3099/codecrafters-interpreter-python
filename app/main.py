@@ -281,7 +281,7 @@ class Binary:
         self.operator = operator
         self.right = right
     def __str__(self):
-        if self.right=="":
+        if self.right is None:
             return ""
         return f"({self.operator.name} {self.left} {self.right})"
     def __repr__(self):
