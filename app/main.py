@@ -451,7 +451,11 @@ class Interpreter:
             return expression  # Return as float otherwise
         except (ValueError, TypeError):
             # If conversion to float fails, return the original expression
+            if expression.startswith("(group") and expression.endswith(')'):
+                expr = expression[6:-1]
+                return expr
             return expression
+            
     def visit_literal(self, literal: Literal):
         return literal
     def visit_grouping(self, grouping: Grouping):
