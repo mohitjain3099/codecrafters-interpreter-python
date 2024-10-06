@@ -290,7 +290,7 @@ class Grouping:
     def __init__(self, expression):
         self.expression = expression
     def __str__(self):
-        if self.expression=="":
+        if self.expression is None:
             return ""
         return f"(group {self.expression})"
     def __repr__(self):
@@ -408,10 +408,13 @@ class Parser:
         if self.match(TOKEN_TYPE.LEFT_PAREN):
             if self.check(TOKEN_TYPE.RIGHT_PAREN):
                 self.error(self.peek(), "Expect expression.")
+                self.advance()  # Consume the right parenthesis
                 return None
             expr = self.expression()
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
+
+        return self.error(self.peek(), "Expect expression.")
 
         return self.error(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
@@ -513,7 +516,7 @@ def main():
                     tokens.append(token)
             par = Parser(tokens)
             expression = par.parse()
-            if expression:
+            if expression is not None:
                 print(expression)
         elif command == "evaluate":
             lex = Lexer(file_contents)
