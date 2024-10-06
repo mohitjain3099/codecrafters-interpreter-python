@@ -293,7 +293,9 @@ class Grouping:
         return str(self)
 class Literal:
     def __init__(self, value):
-        if float(value).is_integer():
+        if bool(value) == value:
+            self.value = value
+        elif float(value).is_integer():
             self.value = int(value)
         elif float(value) == value:
             self.value = float(value)
