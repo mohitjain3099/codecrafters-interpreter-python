@@ -281,6 +281,8 @@ class Binary:
         self.operator = operator
         self.right = right
     def __str__(self):
+        if self.right is None:
+            return ""
         return f"({self.operator.name} {self.left} {self.right})"
     def __repr__(self):
         return str(self)
@@ -410,7 +412,7 @@ class Parser:
         
     def error(self, token: Token, message: str):
         print(f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr)
-        return ""
+        return None
 
 class Interpreter():
     def evaluate(self, expression):
