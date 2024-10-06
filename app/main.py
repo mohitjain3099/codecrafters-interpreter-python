@@ -292,6 +292,8 @@ class Grouping:
     def __init__(self, expression):
         self.expression = expression
     def __str__(self):
+        if self.expression is None:
+            return "nil"
         return f"(group {self.expression})"
     def __repr__(self):
         return str(self)
