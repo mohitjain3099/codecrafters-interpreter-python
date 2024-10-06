@@ -320,9 +320,15 @@ class Parser:
         self.current = 0
     def parse(self):
         try:
-            return self.expression()
+            expr = self.expression()
+            if self.current < len(self.tokens) - 1:
+                self.error(self.peek(), "Unexpected tokens after expression.")
+                return None
+            return expr
         except Exception as e:
-            print(f"Error: {str(e)}", file=sys.stderr)
+            print(f"[line {self.peek().line}] Error: {str(e)}", file=sys.stderr)
+            global exit_code
+            exit_code = 65
             return None
     def expression(self):
         return self.equality()
@@ -398,9 +404,10 @@ class Parser:
         if self.match(TOKEN_TYPE.NUMBER, TOKEN_TYPE.STRING):
             return Literal(self.previous().value)
         if self.match(TOKEN_TYPE.LEFT_PAREN):
+            if self.check(TOKEN_TYPE.RIGHT_PAREN):
+                self.error(self.peek(), "Expect expression.")
+                return None
             expr = self.expression()
-            if not expr:
-                return self.error(self.peek(), "Expect expression.")
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
 
