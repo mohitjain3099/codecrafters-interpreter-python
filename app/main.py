@@ -442,36 +442,35 @@ class Parser:
         return None
 class Interpreter:
     def evaluate(self, expression: str):
-        if expression.startswith("(- "):
-            # Handle negation
-            inner_expression = expression[3:-1].strip()
-            value = self.evaluate(inner_expression)
-            return -value
-        elif expression.startswith("(! "):
-            # Handle logical not
-            inner_expression = expression[3:-1].strip()
-            value = self.evaluate(inner_expression)
-            return not value
-        elif expression.startswith("(group "):
-            # Remove the "(group " prefix and ")" suffix
-            inner_expression = expression[7:-1].strip()
-            return self.evaluate(inner_expression)
-        elif expression == "true":
-            return True
-        elif expression == "false":
-            return False
-        elif expression == "nil":
-            return None
-        try:
-            # Try to convert expression to float first
-            value = float(expression)
-            # Check if the float is an integer
-            if value.is_integer():
-                return int(value)  # Return as integer if it is a whole number
-            return value  # Return as float otherwise
-        except ValueError:
-            # If conversion to float fails, return the original expression
-            return expression
+        if expression.startswith("("):
+            # Handle binary operations
+            parts = expression[1:-1].split()
+            operator = parts[0]
+            left = self.evaluate(parts[1])
+            right = self.evaluate(parts[2])
+            
+            if operator == "*":
+                return left * right
+            elif operator == "/":
+                return left / right
+            elif operator == "+":
+                return left + right
+            elif operator == "-":
+                return left - right
+        elif expression.startswith("-"):
+            # Handle unary negation
+            return -self.evaluate(expression[1:])
+        else:
+            try:
+                # Try to convert expression to float first
+                value = float(expression)
+                # Check if the float is an integer
+                if value.is_integer():
+                    return int(value)  # Return as integer if it is a whole number
+                return value  # Return as float otherwise
+            except ValueError:
+                # If conversion to float fails, return the original expression
+                return expression
             
     def visit_literal(self, literal: Literal):
         return literal
