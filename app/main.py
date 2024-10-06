@@ -294,7 +294,7 @@ class Grouping:
     def __str__(self):
         if self.expression is None:
             return "nil"
-        return f"(group {self.expression})"
+        return f"group {self.expression}"
     def __repr__(self):
         return str(self)
 class Literal:
