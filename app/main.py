@@ -452,7 +452,7 @@ class Interpreter:
         except (ValueError, TypeError):
             # If conversion to float fails, return the original expression
             if expression.startswith("(group") and expression.endswith(')'):
-                expr = expression[6:-1]
+                expr = expression[7:-1]
                 return expr
             return expression
             
