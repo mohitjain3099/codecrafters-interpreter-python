@@ -525,10 +525,13 @@ def main():
                 interpreter = Interpreter()
                 value = interpreter.evaluate(expression)
                 if value is None:
-                    value = "nil"
+                    print("nil")
                 elif isinstance(value, bool):
-                    value = str(value).lower()
-                print(value)
+                    print(str(value).lower())
+                else:
+                    print(int(value) if isinstance(value, float) and value.is_integer() else value)
+
+
     if exit_code != 0:
         sys.exit(exit_code)  # Exit with error code
     # Default success exit
