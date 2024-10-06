@@ -294,7 +294,7 @@ class Grouping:
     def __str__(self):
         if self.expression is None:
             return "nil"
-        return f"group {self.expression}"
+        return f"(group {self.expression})"
     def __repr__(self):
         return str(self)
 class Literal:
@@ -314,9 +314,6 @@ class Unary:
         return f"({self.operator.name} {self.right})"
     def __repr__(self):
         return str(self)
-
-
-
 
 class Parser:
     def __init__(self, tokens: list[Token]):
@@ -417,7 +414,8 @@ class Parser:
             if isinstance(expr,str):
                 while expr.startswith('"') and expr.endswith('"'):
                     expr = expr[1:-1]
-            return Grouping(expr)
+            if expr is not None or expr != "":
+                return Grouping(expr)
 
         return self.error(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
