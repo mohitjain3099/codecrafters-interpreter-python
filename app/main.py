@@ -290,9 +290,7 @@ class Grouping:
     def __init__(self, expression):
         self.expression = expression
     def __str__(self):
-        if self.expression is None:
-            return ""
-        return f"(group {self.expression})"
+        return f"({self.expression})"
     def __repr__(self):
         return str(self)
 class Literal:
@@ -413,8 +411,6 @@ class Parser:
             expr = self.expression()
             self.consume(TOKEN_TYPE.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
-
-        return self.error(self.peek(), "Expect expression.")
 
         return self.error(self.peek(), "Expect expression.")
     def consume(self, token_type, message):
