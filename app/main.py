@@ -453,44 +453,46 @@ class Interpreter:
             
             if expression.startswith("("):
                 # Find the innermost expression
-                stack = []
-                start = 0
-                for i, char in enumerate(expression):
-                    if char == '(':
-                        stack.append(i)
-                    elif char == ')':
-                        if stack:
-                            start = stack.pop()
-                            if not stack:
-                                inner_expr = expression[start+1:i]
-                                result = self.evaluate(inner_expr)
-                                new_expr = expression[:start] + str(result) + expression[i+1:]
-                                return self.evaluate(new_expr)
-                
-                # If we're here, it's a simple expression
-                parts = expression[1:-1].split(maxsplit=2)
-                if len(parts) < 3:
-                    raise ValueError(f"Invalid expression: {expression}")
-                
-                operator, left, right = parts
-                left_value = self.evaluate(left)
-                right_value = self.evaluate(right)
-                
-                if operator == "STAR":
-                    return left_value * right_value
-                elif operator == "SLASH":
-                    if right_value == 0:
-                        raise ValueError("Division by zero")
-                    return left_value / right_value
-                elif operator == "PLUS":
-                    return left_value + right_value
-                elif operator == "MINUS":
-                    return left_value - right_value
-                else:
-                    raise ValueError(f"Unknown operator: {operator}")
-            
-        raise ValueError(f"Unable to evaluate: {expression}")
-
+                stack =[]
+                for char in expression:
+                    if char=='(':
+                        continue
+                    elif char==')':
+                        right = stack.pop()
+                        left = stack.pop()
+                        operator = stack.pop()
+                        stack.append(self.do_operation(left, operator, right))
+                    else:
+                        stack.append(char)
+                return stack[0]
+            else:
+                return expression
+    def do_operation(self, left, operator, right):
+        if operator == "+":
+            return left + right
+        elif operator == "-":
+            return left - right
+        elif operator == "*":
+            return left * right
+        elif operator == "/":
+            return left / right
+        elif operator == "==":
+            return left == right
+        elif operator == "!=":
+            return left != right
+        elif operator == "<":
+            return left < right
+        elif operator == "<=":
+            return left <= right
+        elif operator == ">":
+            return left > right
+        elif operator == ">=":
+            return left >= right
+        elif operator == "and":
+            return left and right
+        elif operator == "or":
+            return left or right
+        raise ValueError(f"Unknown operator: {operator}")
     def visit_literal(self, literal):
         return literal
 
