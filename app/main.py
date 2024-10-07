@@ -442,6 +442,7 @@ class Parser:
         return None
 
 class Interpreter:
+    
     def evaluate(self, expression: str):
         if isinstance(expression, (int, float)):
             return expression
@@ -452,28 +453,36 @@ class Interpreter:
                 pass
             
             if expression.startswith("("):
-                # Find the innermost expression
-                stack =[]
-                extra=0
+                stack = []
                 tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
                 for char in tokenexpression:
-                    if char=='(':
-                        continue
-                    elif char==')':
-                        if extra==0:
-                            right = float(stack.pop())
-                            left = float(stack.pop())
-                            operator = stack.pop()
-                            stack.append(self.do_operation(left, operator, right))
+                    if char == '(':
+                        stack.append(char)
+                    elif char == ')':
+                        sub_expr = []
+                        while stack and stack[-1] != '(':
+                            sub_expr.append(stack.pop())
+                        if stack:
+                            stack.pop()  # Remove the '('
+                        if len(sub_expr) == 1:
+                            stack.append(sub_expr[0])
+                        elif len(sub_expr) == 3:
+                            right, operator, left = sub_expr
+                            result = self.do_operation(float(left), operator, float(right))
+                            stack.append(str(result))
                         else:
-                            extra-=1
+                            raise ValueError(f"Invalid expression: {sub_expr}")
                     elif char == "group":
-                        extra+=1
+                        continue  # Ignore 'group' keyword
                     else:
                         stack.append(char)
-                return stack[0]
+                
+                if len(stack) != 1:
+                    raise ValueError(f"Invalid expression: {expression}")
+                return float(stack[0])
             else:
                 return expression
+
     def do_operation(self, left, operator, right):
         if operator == "+":
             return left + right
