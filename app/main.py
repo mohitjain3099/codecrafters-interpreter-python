@@ -459,11 +459,14 @@ class Interpreter:
                 for char in tokenexpression:
                     if char=='(':
                         continue
-                    elif char==')' and extra==0:
-                        right = float(stack.pop())
-                        left = float(stack.pop())
-                        operator = stack.pop()
-                        stack.append(self.do_operation(left, operator, right))
+                    elif char==')':
+                        if extra==0:
+                            right = float(stack.pop())
+                            left = float(stack.pop())
+                            operator = stack.pop()
+                            stack.append(self.do_operation(left, operator, right))
+                        else:
+                            extra-=1
                     elif char == "group":
                         extra+=1
                     else:
