@@ -444,6 +444,7 @@ class Parser:
 
 class Interpreter:
     def __init__(self):
+        # Define supported operators and their functions
         self.operators = {
             '+': operator.add,
             '-': operator.sub,
@@ -452,106 +453,74 @@ class Interpreter:
         }
 
     def evaluate(self, expression: str):
-        # Direct evaluation for numbers
+        """Main method to evaluate the input expression"""
         if isinstance(expression, (int, float)):
             return expression
-        elif isinstance(expression, str):
-            # Try to evaluate a single number string
-            try:
-                return float(expression)
-            except ValueError:
-                pass
-            
-            # If the expression contains parentheses, process it as a parsed expression
-            if '(' in expression or ')' in expression:
-                return self.parse_expression(expression)
-            else:
-                # If it's a simple expression like "7 * 2 / 7 / 1"
-                return self.evaluate_simple_expression(expression)
 
-    def parse_expression(self, expression):
-        """This function handles parsed expressions like (/ (* 18 3) (group (* 3 6)))"""
-        # Tokenize the expression by spaces, ensuring parentheses are separated
-        tokens = expression.replace("(", " ( ").replace(")", " ) ").split()
+        try:
+            # Direct evaluation if it's a single number
+            return float(expression)
+        except ValueError:
+            pass
+        
+        # Tokenize the expression (split by spaces)
+        tokens = expression.split()
         return self.process_tokens(tokens)
 
     def process_tokens(self, tokens):
-        """ Process the tokens and return the evaluated result. """
-        if len(tokens) == 0:
-            raise ValueError("Empty expression")
+        """Process the tokens to evaluate the expression"""
+        output = []
+        operators = []
         
-        token = tokens.pop(0)
-        
-        if token == '(':
-            sub_expr = []
-            while tokens[0] != ')':
-                sub_expr.append(tokens.pop(0))
-            tokens.pop(0)  # Remove the closing ')'
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
             
-            # Now we have the subexpression, we need to evaluate it
-            return self.evaluate_subexpression(sub_expr)
-        else:
-            # If the token is not a parenthesis, treat it as a literal
-            try:
-                return float(token)
-            except ValueError:
-                return token
-
-    def evaluate_subexpression(self, sub_expr):
-        """ This function evaluates subexpressions like (* 18 3) """
-        if len(sub_expr) < 3:
-            raise ValueError(f"Invalid subexpression: {sub_expr}")
-        
-        operator = sub_expr[0]  # First item is the operator
-        left = sub_expr[1]  # Second item is the left operand
-        right = sub_expr[2]  # Third item is the right operand
-        
-        # Evaluate both sides if they are expressions
-        left_value = self.evaluate(left)
-        right_value = self.evaluate(right)
-        
-        return self.do_operation(left_value, operator, right_value)
-
-    def evaluate_simple_expression(self, expression: str):
-        """ Evaluate a simple mathematical expression like '7 * 2 / 7 / 1' """
-        tokens = expression.split()
-        
-        # First, handle multiplication and division
-        i = 0
-        while i < len(tokens):
-            if tokens[i] in '*/':
-                operator = tokens[i]
-                left = float(tokens[i - 1])
-                right = float(tokens[i + 1])
-                result = self.do_operation(left, operator, right)
-                
-                # Replace the tokens with the result
-                tokens[i - 1:i + 2] = [str(result)]
-                i -= 1  # Step back to reevaluate the new expression size
+            if token in self.operators:
+                # Handle operators: store them for precedence handling
+                while operators and self.precedence(operators[-1]) >= self.precedence(token):
+                    output.append(operators.pop())
+                operators.append(token)
+            else:
+                # If it's a number, append it to the output
+                output.append(token)
             i += 1
         
-        # Now handle addition and subtraction
-        i = 0
-        while i < len(tokens):
-            if tokens[i] in '+-':
-                operator = tokens[i]
-                left = float(tokens[i - 1])
-                right = float(tokens[i + 1])
-                result = self.do_operation(left, operator, right)
-                
-                # Replace the tokens with the result
-                tokens[i - 1:i + 2] = [str(result)]
-                i -= 1  # Step back to reevaluate the new expression size
-            i += 1
+        # Append any remaining operators
+        while operators:
+            output.append(operators.pop())
+        
+        # Now evaluate the output (in postfix notation)
+        return self.evaluate_postfix(output)
 
-        return float(tokens[0])
+    def precedence(self, operator):
+        """Return precedence for operators: higher value means higher precedence"""
+        if operator in ('*', '/'):
+            return 2
+        elif operator in ('+', '-'):
+            return 1
+        return 0
+
+    def evaluate_postfix(self, tokens):
+        """Evaluate the expression in postfix notation"""
+        stack = []
+        for token in tokens:
+            if token in self.operators:
+                # Pop two operands and apply the operator
+                right = float(stack.pop())
+                left = float(stack.pop())
+                result = self.do_operation(left, token, right)
+                stack.append(result)
+            else:
+                # If it's a number, push it onto the stack
+                stack.append(float(token))
+        return stack[0]  # The final result will be the only element in the stack
 
     def do_operation(self, left, operator, right):
-        """ Perform the binary operation """
+        """Perform the binary operation"""
         if operator in self.operators:
             return self.operators[operator](left, right)
-        else:
-            raise ValueError(f"Unknown operator: {operator}")
+        raise ValueError(f"Unknown operator: {operator}")
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
