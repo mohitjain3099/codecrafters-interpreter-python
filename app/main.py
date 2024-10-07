@@ -442,36 +442,28 @@ class Parser:
         return None
 
 class Interpreter:
-    def evaluate(self, expression: str):
-        if not expression.startswith('('):
+    def evaluate(self, expression):
+        if isinstance(expression, str):
             try:
                 value = float(expression)
                 return int(value) if value.is_integer() else value
             except ValueError:
                 return expression
-
-        stack = []
-        tokens = expression[1:-1].split()
         
-        for token in tokens:
-            if token == ')':
-                right = stack.pop()
-                left = stack.pop()
-                operator = stack.pop()
-                result = self.apply_operation(operator, left, right)
-                stack.append(result)
-            elif token == '(':
-                continue
-            else:
-                stack.append(token)
-
-        result = stack[0]
-        return int(result) if isinstance(result, float) and result.is_integer() else result
+        if expression.startswith("("):
+            parts = expression[1:-1].split(maxsplit=2)
+            if len(parts) < 3:
+                raise ValueError(f"Invalid expression: {expression}")
+            
+            operator, left, right = parts[0], parts[1], parts[2]
+            left_value = self.evaluate(left)
+            right_value = self.evaluate(right)
+            
+            return self.apply_operation(operator, left_value, right_value)
+        
+        return expression
 
     def apply_operation(self, operation, left, right):
-        left = self.evaluate(left)
-        right = self.evaluate(right)
-        
         if operation == '*':
             return left * right
         elif operation == '/':
@@ -482,14 +474,16 @@ class Interpreter:
             return left - right
         else:
             raise ValueError(f"Unknown operation: {operation}")
+
     def visit_literal(self, literal):
         return literal
 
     def visit_grouping(self, grouping):
-        return self.evaluate(grouping[7:-1])
+        return self.evaluate(grouping[7:-1])  # Remove "(group " and ")"
 
     def visit_unary(self, unary):
-        operator, right = unary.split(maxsplit=1)
+        parts = unary[1:-1].split(maxsplit=1)
+        operator, right = parts[0], parts[1]
         right_value = self.evaluate(right)
         if operator == "-":
             return -right_value
