@@ -458,6 +458,7 @@ class Interpreter:
                 i=0
                 while i < len(tokenexpression):
                     if tokenexpression[i] == "(":
+                        i+=1
                         continue
                     elif tokenexpression[i] == ")":
                         right = float(stack.pop())
