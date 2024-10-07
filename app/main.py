@@ -443,33 +443,43 @@ class Parser:
 
 class Interpreter:
     def evaluate(self, expression: str):
-        if isinstance(expression, (int, float)):
-            return expression
-        elif isinstance(expression, str):
+        if not expression.startswith('('):
             try:
-                return float(expression)
+                value = float(expression)
+                return int(value) if value.is_integer() else value
             except ValueError:
-                pass
-        
-        if expression.startswith("("):
-            parts = expression[1:-1].split(maxsplit=3)
-            if len(parts) < 3:
-                raise ValueError(f"Invalid expression: {expression}")
-            
-            operator, left, right = parts[0], parts[1], " ".join(parts[2:])
-            left_value = self.evaluate(left)
-            
-            if operator == "*":
-                return left_value * self.evaluate(right)
-            elif operator == "/":
-                return left_value / self.evaluate(right)
-            elif operator == "+":
-                return left_value + self.evaluate(right)
-            elif operator == "-":
-                return left_value - self.evaluate(right)
-        else:
-            return float(expression)
+                return expression
 
+        stack = []
+        tokens = expression[1:-1].replace('(', ' ( ').replace(')', ' ) ').split()
+        
+        for token in reversed(tokens):
+            if token == '(':
+                operation = stack.pop()
+                right = stack.pop()
+                left = stack.pop()
+                result = self.apply_operation(operation, left, right)
+                stack.append(result)
+            else:
+                stack.append(token)
+
+        result = stack[0]
+        return int(result) if isinstance(result, float) and result.is_integer() else result
+
+    def apply_operation(self, operation, left, right):
+        left = self.evaluate(left)
+        right = self.evaluate(right)
+        
+        if operation == '*':
+            return left * right
+        elif operation == '/':
+            return left / right
+        elif operation == '+':
+            return left + right
+        elif operation == '-':
+            return left - right
+        else:
+            raise ValueError(f"Unknown operation: {operation}")
     def visit_literal(self, literal):
         return literal
 
