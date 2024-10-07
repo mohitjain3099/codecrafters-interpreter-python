@@ -445,13 +445,18 @@ class Interpreter:
     def evaluate(self, expression: str):
         if isinstance(expression, (int, float)):
             return expression
-        elif expression.startswith("("):
-            # Handle binary operations
-            parts = expression[1:-1].split(maxsplit=2)
-            if len(parts) != 3:
+        elif isinstance(expression, str):
+            try:
+                return float(expression)
+            except ValueError:
+                pass
+        
+        if expression.startswith("("):
+            parts = expression[1:-1].split(maxsplit=3)
+            if len(parts) < 3:
                 raise ValueError(f"Invalid expression: {expression}")
             
-            operator, left, right = parts
+            operator, left, right = parts[0], parts[1], " ".join(parts[2:])
             left_value = self.evaluate(left)
             right_value = self.evaluate(right)
             
@@ -463,20 +468,8 @@ class Interpreter:
                 return left_value + right_value
             elif operator == "-":
                 return left_value - right_value
-        elif expression.startswith("-"):
-            # Handle unary negation
-            return -self.evaluate(expression[1:])
         else:
-            try:
-                # Try to convert expression to float first
-                value = float(expression)
-                # Check if the float is an integer
-                if value.is_integer():
-                    return int(value)  # Return as integer if it is a whole number
-                return value  # Return as float otherwise
-            except ValueError:
-                # If conversion to float fails, return the original expression
-                return expression
+            return float(expression)
 
     def visit_literal(self, literal):
         return literal
