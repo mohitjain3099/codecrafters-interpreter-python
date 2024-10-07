@@ -458,16 +458,15 @@ class Interpreter:
             
             operator, left, right = parts[0], parts[1], " ".join(parts[2:])
             left_value = self.evaluate(left)
-            right_value = self.evaluate(right)
             
             if operator == "*":
-                return left_value * right_value
+                return left_value * self.evaluate(right)
             elif operator == "/":
-                return left_value / right_value
+                return left_value / self.evaluate(right)
             elif operator == "+":
-                return left_value + right_value
+                return left_value + self.evaluate(right)
             elif operator == "-":
-                return left_value - right_value
+                return left_value - self.evaluate(right)
         else:
             return float(expression)
 
