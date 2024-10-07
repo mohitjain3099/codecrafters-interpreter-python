@@ -1,3 +1,4 @@
+import operator
 import sys
 import re
 from enum import Enum
@@ -442,6 +443,14 @@ class Parser:
         return None
 
 class Interpreter:
+    def __init__(self):
+        self.operators = {
+            '+': operator.add,
+            '-': operator.sub,
+            '*': operator.mul,
+            '/': operator.truediv
+        }
+
     def evaluate(self, expression: str):
         # Direct evaluation for numbers
         if isinstance(expression, (int, float)):
@@ -453,18 +462,19 @@ class Interpreter:
             except ValueError:
                 pass
             
-            # If the expression starts with "(" process it as a parsed expression
-            if expression.startswith("("):
+            # If the expression contains parentheses, process it as a parsed expression
+            if '(' in expression or ')' in expression:
                 return self.parse_expression(expression)
             else:
-                raise ValueError(f"Invalid expression: {expression}")
-    
+                # If it's a simple expression like "7 * 2 / 7 / 1"
+                return self.evaluate_simple_expression(expression)
+
     def parse_expression(self, expression):
-        """ This function handles parsed expressions such as (/ (* 18 3) (group (* 3 6))) """
+        """This function handles parsed expressions like (/ (* 18 3) (group (* 3 6)))"""
         # Tokenize the expression by spaces, ensuring parentheses are separated
         tokens = expression.replace("(", " ( ").replace(")", " ) ").split()
         return self.process_tokens(tokens)
-    
+
     def process_tokens(self, tokens):
         """ Process the tokens and return the evaluated result. """
         if len(tokens) == 0:
@@ -486,7 +496,7 @@ class Interpreter:
                 return float(token)
             except ValueError:
                 return token
-    
+
     def evaluate_subexpression(self, sub_expr):
         """ This function evaluates subexpressions like (* 18 3) """
         if len(sub_expr) < 3:
@@ -501,40 +511,47 @@ class Interpreter:
         right_value = self.evaluate(right)
         
         return self.do_operation(left_value, operator, right_value)
-    
+
+    def evaluate_simple_expression(self, expression: str):
+        """ Evaluate a simple mathematical expression like '7 * 2 / 7 / 1' """
+        tokens = expression.split()
+        
+        # First, handle multiplication and division
+        i = 0
+        while i < len(tokens):
+            if tokens[i] in '*/':
+                operator = tokens[i]
+                left = float(tokens[i - 1])
+                right = float(tokens[i + 1])
+                result = self.do_operation(left, operator, right)
+                
+                # Replace the tokens with the result
+                tokens[i - 1:i + 2] = [str(result)]
+                i -= 1  # Step back to reevaluate the new expression size
+            i += 1
+        
+        # Now handle addition and subtraction
+        i = 0
+        while i < len(tokens):
+            if tokens[i] in '+-':
+                operator = tokens[i]
+                left = float(tokens[i - 1])
+                right = float(tokens[i + 1])
+                result = self.do_operation(left, operator, right)
+                
+                # Replace the tokens with the result
+                tokens[i - 1:i + 2] = [str(result)]
+                i -= 1  # Step back to reevaluate the new expression size
+            i += 1
+
+        return float(tokens[0])
+
     def do_operation(self, left, operator, right):
         """ Perform the binary operation """
-        if operator == "+":
-            return left + right
-        elif operator == "-":
-            return left - right
-        elif operator == "*":
-            return left * right
-        elif operator == "/":
-            return left / right
-        elif operator == "==":
-            return left == right
-        elif operator == "!=":
-            return left != right
-        elif operator == "<":
-            return left < right
-        elif operator == "<=":
-            return left <= right
-        elif operator == ">":
-            return left > right
-        elif operator == ">=":
-            return left >= right
-        elif operator == "and":
-            return left and right
-        elif operator == "or":
-            return left or right
+        if operator in self.operators:
+            return self.operators[operator](left, right)
         else:
             raise ValueError(f"Unknown operator: {operator}")
-
-    def visit_grouping(self, grouping):
-        """ Handle expressions with group, such as (group (* 3 6)) """
-        expression_inside_group = grouping[7:-1]  # Strip "(group " and ")"
-        return self.evaluate(expression_inside_group)
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
