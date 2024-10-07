@@ -1,4 +1,3 @@
-import operator
 import sys
 import re
 from enum import Enum
@@ -443,115 +442,54 @@ class Parser:
         return None
 
 class Interpreter:
-    def __init__(self):
-        self.operators = {
-            '+': operator.add,
-            '-': operator.sub,
-            '*': operator.mul,
-            '/': operator.truediv
-        }
-
+    
     def evaluate(self, expression: str):
-        # Direct evaluation for numbers
-        if isinstance(expression, (int, float)):
-            return expression
-        elif isinstance(expression, str):
-            # Try to evaluate a single number string
-            try:
-                return float(expression)
-            except ValueError:
-                pass
-            
-            # If the expression contains parentheses, process it as a parsed expression
-            if '(' in expression or ')' in expression:
-                return self.parse_expression(expression)
-            else:
-                # If it's a simple expression like "7 * 2 / 7 / 1"
-                return self.evaluate_simple_expression(expression)
-
-    def parse_expression(self, expression):
-        """This function handles parsed expressions like (/ (* 18 3) (group (* 3 6)))"""
-        # Tokenize the expression by spaces, ensuring parentheses are separated
-        tokens = expression.replace("(", " ( ").replace(")", " ) ").split()
-        return self.process_tokens(tokens)
-
-    def process_tokens(self, tokens):
-        """ Process the tokens and return the evaluated result. """
-        if len(tokens) == 0:
-            raise ValueError("Empty expression")
-        
-        token = tokens.pop(0)
-        
-        if token == '(':
-            sub_expr = []
-            while tokens[0] != ')':
-                sub_expr.append(tokens.pop(0))
-            tokens.pop(0)  # Remove the closing ')'
-            
-            # Now we have the subexpression, we need to evaluate it
-            return self.evaluate_subexpression(sub_expr)
-        else:
-            # If the token is not a parenthesis, treat it as a literal
-            try:
-                return float(token)
-            except ValueError:
-                return token
-
-    def evaluate_subexpression(self, sub_expr):
-        """ This function evaluates subexpressions like (* 18 3) """
-        if len(sub_expr) < 3:
-            raise ValueError(f"Invalid subexpression: {sub_expr}")
-        
-        operator = sub_expr[0]  # First item is the operator
-        left = sub_expr[1]  # Second item is the left operand
-        right = sub_expr[2]  # Third item is the right operand
-        
-        # Evaluate both sides if they are expressions
-        left_value = self.evaluate(left)
-        right_value = self.evaluate(right)
-        
-        return self.do_operation(left_value, operator, right_value)
-
-    def evaluate_simple_expression(self, expression: str):
-        """ Evaluate a simple mathematical expression like '7 * 2 / 7 / 1' """
+        """Evaluate a string-form expression parsed in prefix notation"""
+        # Tokenize the expression by splitting on whitespace
         tokens = expression.split()
-        
-        # First, handle multiplication and division
-        i = 0
-        while i < len(tokens):
-            if tokens[i] in '*/':
-                operator = tokens[i]
-                left = float(tokens[i - 1])
-                right = float(tokens[i + 1])
-                result = self.do_operation(left, operator, right)
-                
-                # Replace the tokens with the result
-                tokens[i - 1:i + 2] = [str(result)]
-                i -= 1  # Step back to reevaluate the new expression size
-            i += 1
-        
-        # Now handle addition and subtraction
-        i = 0
-        while i < len(tokens):
-            if tokens[i] in '+-':
-                operator = tokens[i]
-                left = float(tokens[i - 1])
-                right = float(tokens[i + 1])
-                result = self.do_operation(left, operator, right)
-                
-                # Replace the tokens with the result
-                tokens[i - 1:i + 2] = [str(result)]
-                i -= 1  # Step back to reevaluate the new expression size
-            i += 1
+        return self.evaluate_tokens(tokens)
 
-        return float(tokens[0])
+    def evaluate_tokens(self, tokens):
+        """Recursive function to evaluate tokens in prefix notation"""
+        # Take the next token
+        token = tokens.pop(0)
+
+        if token.isdigit() or self.is_float(token):
+            # If it's a number, return it as float
+            return float(token)
+        elif token in {"+", "-", "*", "/"}:
+            # If it's an operator, recursively evaluate the left and right operands
+            left = self.evaluate_tokens(tokens)
+            right = self.evaluate_tokens(tokens)
+            return self.do_operation(left, token, right)
+        elif token == "group":
+            # Handle the 'group' keyword (if needed)
+            return self.evaluate_tokens(tokens)
+        else:
+            raise ValueError(f"Unknown token: {token}")
 
     def do_operation(self, left, operator, right):
-        """ Perform the binary operation """
-        if operator in self.operators:
-            return self.operators[operator](left, right)
+        """Perform basic operations based on the operator"""
+        if operator == "+":
+            return left + right
+        elif operator == "-":
+            return left - right
+        elif operator == "*":
+            return left * right
+        elif operator == "/":
+            if right == 0:
+                raise ZeroDivisionError("Division by zero is undefined")
+            return left / right
         else:
             raise ValueError(f"Unknown operator: {operator}")
+
+    def is_float(self, token):
+        """Check if a token can be interpreted as a float"""
+        try:
+            float(token)
+            return True
+        except ValueError:
+            return False
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
