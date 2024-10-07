@@ -450,25 +450,45 @@ class Interpreter:
                 return float(expression)
             except ValueError:
                 pass
-        
-        if expression.startswith("("):
-            parts = expression[1:-1].split(maxsplit=3)
-            if len(parts) < 3:
-                raise ValueError(f"Invalid expression: {expression}")
             
-            operator, left, right = parts[0], parts[1], " ".join(parts[2:])
-            left_value = self.evaluate(left)
-            right_value = self.evaluate(right)
+            if expression.startswith("("):
+                # Find the innermost expression
+                stack = []
+                start = 0
+                for i, char in enumerate(expression):
+                    if char == '(':
+                        stack.append(i)
+                    elif char == ')':
+                        if stack:
+                            start = stack.pop()
+                            if not stack:
+                                inner_expr = expression[start+1:i]
+                                result = self.evaluate(inner_expr)
+                                new_expr = expression[:start] + str(result) + expression[i+1:]
+                                return self.evaluate(new_expr)
+                
+                # If we're here, it's a simple expression
+                parts = expression[1:-1].split(maxsplit=2)
+                if len(parts) < 3:
+                    raise ValueError(f"Invalid expression: {expression}")
+                
+                operator, left, right = parts
+                left_value = self.evaluate(left)
+                right_value = self.evaluate(right)
+                
+                if operator == "STAR":
+                    return left_value * right_value
+                elif operator == "SLASH":
+                    if right_value == 0:
+                        raise ValueError("Division by zero")
+                    return left_value / right_value
+                elif operator == "PLUS":
+                    return left_value + right_value
+                elif operator == "MINUS":
+                    return left_value - right_value
+                else:
+                    raise ValueError(f"Unknown operator: {operator}")
             
-            if operator == "*":
-                return left_value * right_value
-            elif operator == "/":
-                return left_value / right_value
-            elif operator == "+":
-                return left_value + right_value
-            elif operator == "-":
-                return left_value - right_value
-        
         raise ValueError(f"Unable to evaluate: {expression}")
 
     def visit_literal(self, literal):
