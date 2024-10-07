@@ -442,38 +442,34 @@ class Parser:
         return None
 
 class Interpreter:
-    def evaluate(self, expression):
-        if isinstance(expression, str):
+    def evaluate(self, expression: str):
+        if isinstance(expression, (int, float)):
+            return expression
+        elif isinstance(expression, str):
             try:
-                value = float(expression)
-                return int(value) if value.is_integer() else value
+                return float(expression)
             except ValueError:
-                return expression
+                pass
         
         if expression.startswith("("):
             parts = expression[1:-1].split(maxsplit=2)
-            if len(parts) < 3:
+            if len(parts) != 3:
                 raise ValueError(f"Invalid expression: {expression}")
             
             operator, left, right = parts[0], parts[1], parts[2]
             left_value = self.evaluate(left)
             right_value = self.evaluate(right)
             
-            return self.apply_operation(operator, left_value, right_value)
+            if operator == "*":
+                return left_value * right_value
+            elif operator == "/":
+                return left_value / right_value
+            elif operator == "+":
+                return left_value + right_value
+            elif operator == "-":
+                return left_value - right_value
         
-        return expression
-
-    def apply_operation(self, operation, left, right):
-        if operation == '*':
-            return left * right
-        elif operation == '/':
-            return left / right
-        elif operation == '+':
-            return left + right
-        elif operation == '-':
-            return left - right
-        else:
-            raise ValueError(f"Unknown operation: {operation}")
+        raise ValueError(f"Unable to evaluate: {expression}")
 
     def visit_literal(self, literal):
         return literal
