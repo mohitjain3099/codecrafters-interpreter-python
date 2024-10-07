@@ -452,11 +452,11 @@ class Interpreter:
                 pass
         
         if expression.startswith("("):
-            parts = expression[1:-1].split(maxsplit=2)
-            if len(parts) != 3:
+            parts = expression[1:-1].split(maxsplit=3)
+            if len(parts) < 3:
                 raise ValueError(f"Invalid expression: {expression}")
             
-            operator, left, right = parts[0], parts[1], parts[2]
+            operator, left, right = parts[0], parts[1], " ".join(parts[2:])
             left_value = self.evaluate(left)
             right_value = self.evaluate(right)
             
@@ -489,7 +489,6 @@ class Interpreter:
 
     def visit_binary(self, binary):
         return self.evaluate(binary)
-    
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
