@@ -452,11 +452,11 @@ class Interpreter:
                 pass
         
         if expression.startswith("("):
-            parts = expression[1:-1].split(maxsplit=3)
+            parts = expression[1:-1].split(" ")
             if len(parts) < 3:
                 raise ValueError(f"Invalid expression: {expression}")
             
-            operator, left, right = parts[0], parts[1], " ".join(parts[2:])
+            operator, left, right = parts[0], parts[1], parts[2]
             left_value = self.evaluate(left)
             right_value = self.evaluate(right)
             
