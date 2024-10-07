@@ -440,23 +440,29 @@ class Parser:
             f"[line {token.line}] Error at '{token.name}': {message}", file=sys.stderr
         )
         return None
+
 class Interpreter:
     def evaluate(self, expression: str):
-        if expression.startswith("("):
+        if isinstance(expression, (int, float)):
+            return expression
+        elif expression.startswith("("):
             # Handle binary operations
-            parts = expression[1:-1].split()
-            operator = parts[0]
-            left = self.evaluate(parts[1])
-            right = self.evaluate(parts[2])
+            parts = expression[1:-1].split(maxsplit=2)
+            if len(parts) != 3:
+                raise ValueError(f"Invalid expression: {expression}")
+            
+            operator, left, right = parts
+            left_value = self.evaluate(left)
+            right_value = self.evaluate(right)
             
             if operator == "*":
-                return left * right
+                return left_value * right_value
             elif operator == "/":
-                return left / right
+                return left_value / right_value
             elif operator == "+":
-                return left + right
+                return left_value + right_value
             elif operator == "-":
-                return left - right
+                return left_value - right_value
         elif expression.startswith("-"):
             # Handle unary negation
             return -self.evaluate(expression[1:])
@@ -471,15 +477,25 @@ class Interpreter:
             except ValueError:
                 # If conversion to float fails, return the original expression
                 return expression
-            
-    def visit_literal(self, literal: Literal):
+
+    def visit_literal(self, literal):
         return literal
-    def visit_grouping(self, grouping: Grouping):
-        raise NotImplementedError()
-    def visit_unary(self, unary: Unary):
-        raise NotImplementedError()
-    def visit_binary(self, binary: Binary):
-        raise NotImplementedError()
+
+    def visit_grouping(self, grouping):
+        return self.evaluate(grouping)
+
+    def visit_unary(self, unary):
+        operator, right = unary.split(maxsplit=1)
+        right_value = self.evaluate(right)
+        if operator == "-":
+            return -right_value
+        elif operator == "!":
+            return not right_value
+        raise ValueError(f"Unknown unary operator: {operator}")
+
+    def visit_binary(self, binary):
+        return self.evaluate(binary)
+    
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
@@ -528,9 +544,10 @@ def main():
                     print("nil")
                 elif isinstance(value, bool):
                     print(str(value).lower())
+                elif isinstance(value, float) and value.is_integer():
+                    print(int(value))
                 else:
-                    print(int(value) if isinstance(value, float) and value.is_integer() else value)
-
+                    print(value)
 
     if exit_code != 0:
         sys.exit(exit_code)  # Exit with error code
