@@ -450,19 +450,42 @@ class Interpreter:
                 return float(expression)
             except ValueError:
                 pass
-        
-        if expression.startswith("("):
-            parts = expression[1:-1].split(" ")
-            if len(parts) < 3:
-                raise ValueError(f"Invalid expression: {expression}")
             
-            operator, left, right = parts[0], parts[1], parts[2]
-            left_value = self.evaluate(left)
-            right_value = self.evaluate(right)
-            
-            return self.do_operation(left_value, operator, right_value)
-        
-        raise ValueError(f"Unable to evaluate: {expression}")
+            if expression.startswith("("):
+                stack = []
+                tokens = expression.replace("(", " ( ").replace(")", " ) ").split()
+                for token in tokens:
+                    if token == '(':
+                        stack.append(token)
+                    elif token == ')':
+                        sub_expr = []
+                        while stack and stack[-1] != '(':
+                            sub_expr.append(stack.pop())
+                        if stack:
+                            stack.pop()  # Remove the '('
+                        if len(sub_expr) == 1:
+                            stack.append(sub_expr[0])
+                        elif len(sub_expr) == 2:
+                            operator, operand = sub_expr
+                            result = self.do_unary_operation(operator, float(operand))
+                            stack.append(str(result))
+                        elif len(sub_expr) == 3:
+                            right, operator, left = sub_expr
+                            result = self.do_operation(float(left), operator, float(right))
+                            stack.append(str(result))
+                        else:
+                            raise ValueError(f"Invalid expression: {sub_expr}")
+                    elif token == "group":
+                        continue
+                    else:
+                        stack.append(token)
+                
+                if len(stack) != 1:
+                    raise ValueError(f"Invalid expression: {expression}")
+                return float(stack[0])
+            else:
+                return expression
+
     def do_operation(self, left, operator, right):
         if operator == "+":
             return left + right
@@ -489,6 +512,14 @@ class Interpreter:
         elif operator == "or":
             return left or right
         raise ValueError(f"Unknown operator: {operator}")
+
+    def do_unary_operation(self, operator, operand):
+        if operator == "-":
+            return -operand
+        elif operator == "!":
+            return not operand
+        raise ValueError(f"Unknown unary operator: {operator}")
+
     def visit_literal(self, literal):
         return literal
 
@@ -499,11 +530,7 @@ class Interpreter:
         parts = unary[1:-1].split(maxsplit=1)
         operator, right = parts[0], parts[1]
         right_value = self.evaluate(right)
-        if operator == "-":
-            return -right_value
-        elif operator == "!":
-            return not right_value
-        raise ValueError(f"Unknown unary operator: {operator}")
+        return self.do_unary_operation(operator, right_value)
 
     def visit_binary(self, binary):
         return self.evaluate(binary)
