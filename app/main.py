@@ -451,30 +451,27 @@ class Interpreter:
             except ValueError:
                 pass
             
-            if expression.startswith("("):
-                # Find the innermost expression
-                stack =[]
-                extra=0
-                tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
-                for char in tokenexpression:
-                    if char=='(':
-                        continue
-                    elif char==')':
-                        if extra==0:
-                            right = float(stack.pop())
-                            left = float(stack.pop())
-                            operator = stack.pop()
-                            stack.append(self.do_operation(left, operator, right))
-                        else:
-                            extra-=1
-                    elif char == "group":
-                        extra+=1
-                    else:
-                        if char != ')':
-                            stack.append(char)
-                return stack[0]
-            else:
-                return expression
+        if expression.startswith("("):
+            parts = expression[1:-1].split(maxsplit=2)
+            if len(parts) < 2:
+                raise ValueError(f"Invalid expression: {expression}")
+            
+            operator = parts[0]
+            
+            if operator == "group":
+                # Handle grouped expressions
+                return self.evaluate(parts[1])
+            
+            if len(parts) < 3:
+                raise ValueError(f"Invalid expression: {expression}")
+            
+            left, right = parts[1], parts[2]
+            left_value = self.evaluate(left)
+            right_value = self.evaluate(right)
+            
+            return self.do_operation(left_value, operator, right_value)
+        
+        return expression
     def do_operation(self, left, operator, right):
         if operator == "+":
             return left + right
