@@ -450,28 +450,19 @@ class Interpreter:
                 return float(expression)
             except ValueError:
                 pass
-            
+        
         if expression.startswith("("):
-            parts = expression[1:-1].replace("(", " ( ").replace(")", " ) ").split(maxsplit=2)
-            if len(parts) < 2:
-                raise ValueError(f"Invalid expression: {expression}")
-            
-            operator = parts[0]
-            
-            if operator == "group":
-                # Handle grouped expressions
-                return self.evaluate(parts[1])
-            
+            parts = expression[1:-1].split(maxsplit=3)
             if len(parts) < 3:
                 raise ValueError(f"Invalid expression: {expression}")
             
-            left, right = parts[1], parts[2]
+            operator, left, right = parts[0], parts[1], " ".join(parts[2:])
             left_value = self.evaluate(left)
             right_value = self.evaluate(right)
             
             return self.do_operation(left_value, operator, right_value)
         
-        return expression
+        raise ValueError(f"Unable to evaluate: {expression}")
     def do_operation(self, left, operator, right):
         if operator == "+":
             return left + right
