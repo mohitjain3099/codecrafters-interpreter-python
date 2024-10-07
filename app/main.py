@@ -454,19 +454,21 @@ class Interpreter:
             if expression.startswith("("):
                 # Find the innermost expression
                 stack =[]
+                extra=0
                 tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
                 for char in tokenexpression:
                     if char=='(':
                         continue
-                    elif char==')':
+                    elif char==')' and extra==0:
                         right = float(stack.pop())
                         left = float(stack.pop())
                         operator = stack.pop()
                         stack.append(self.do_operation(left, operator, right))
                     elif char == "group":
-                        continue
+                        extra+=1
                     else:
-                        stack.append(char)
+                        if char != ')':
+                            stack.append(char)
                 return stack[0]
             else:
                 return expression
