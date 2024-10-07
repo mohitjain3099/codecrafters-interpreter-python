@@ -463,6 +463,8 @@ class Interpreter:
                         left = float(stack.pop())
                         operator = stack.pop()
                         stack.append(self.do_operation(left, operator, right))
+                    if char == "group":
+                        continue
                     else:
                         stack.append(char)
                 return stack[0]
