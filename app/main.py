@@ -474,7 +474,7 @@ class Interpreter:
         return literal
 
     def visit_grouping(self, grouping):
-        return self.evaluate(grouping)
+        return self.evaluate(grouping[7:-1])
 
     def visit_unary(self, unary):
         operator, right = unary.split(maxsplit=1)
