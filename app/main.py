@@ -454,7 +454,8 @@ class Interpreter:
             if expression.startswith("("):
                 # Find the innermost expression
                 stack =[]
-                for char in expression:
+                tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
+                for char in tokenexpression:
                     if char=='(':
                         continue
                     elif char==')':
