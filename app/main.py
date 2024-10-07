@@ -442,34 +442,39 @@ class Parser:
         return None
 
 class Interpreter:
-    
     def evaluate(self, expression: str):
-        """Evaluate a string-form expression parsed in prefix notation"""
-        # Tokenize the expression by splitting on whitespace
-        tokens = expression.split()
-        return self.evaluate_tokens(tokens)
-
-    def evaluate_tokens(self, tokens):
-        """Recursive function to evaluate tokens in prefix notation"""
-        # Take the next token
-        token = tokens.pop(0)
-
-        if token.isdigit() or self.is_float(token):
-            # If it's a number, return it as float
-            return float(token)
-        elif token in {"+", "-", "*", "/"}:
-            # If it's an operator, recursively evaluate the left and right operands
-            left = self.evaluate_tokens(tokens)
-            right = self.evaluate_tokens(tokens)
-            return self.do_operation(left, token, right)
-        elif token == "group":
-            # Handle the 'group' keyword (if needed)
-            return self.evaluate_tokens(tokens)
-        else:
-            raise ValueError(f"Unknown token: {token}")
-
+        if isinstance(expression, (int, float)):
+            return expression
+        elif isinstance(expression, str):
+            try:
+                return float(expression)
+            except ValueError:
+                pass
+            
+            if expression.startswith("("):
+                # Find the innermost expression
+                stack =[]
+                extra=0
+                tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
+                for char in tokenexpression:
+                    if char=='(':
+                        continue
+                    elif char==')':
+                        if extra==0:
+                            right = float(stack.pop())
+                            left = float(stack.pop())
+                            operator = stack.pop()
+                            stack.append(self.do_operation(left, operator, right))
+                        else:
+                            extra-=1
+                    elif char == "group":
+                        extra+=1
+                    else:
+                        stack.append(char)
+                return stack[0]
+            else:
+                return expression
     def do_operation(self, left, operator, right):
-        """Perform basic operations based on the operator"""
         if operator == "+":
             return left + right
         elif operator == "-":
@@ -477,19 +482,42 @@ class Interpreter:
         elif operator == "*":
             return left * right
         elif operator == "/":
-            if right == 0:
-                raise ZeroDivisionError("Division by zero is undefined")
             return left / right
-        else:
-            raise ValueError(f"Unknown operator: {operator}")
+        elif operator == "==":
+            return left == right
+        elif operator == "!=":
+            return left != right
+        elif operator == "<":
+            return left < right
+        elif operator == "<=":
+            return left <= right
+        elif operator == ">":
+            return left > right
+        elif operator == ">=":
+            return left >= right
+        elif operator == "and":
+            return left and right
+        elif operator == "or":
+            return left or right
+        raise ValueError(f"Unknown operator: {operator}")
+    def visit_literal(self, literal):
+        return literal
 
-    def is_float(self, token):
-        """Check if a token can be interpreted as a float"""
-        try:
-            float(token)
-            return True
-        except ValueError:
-            return False
+    def visit_grouping(self, grouping):
+        return self.evaluate(grouping[7:-1])  # Remove "(group " and ")"
+
+    def visit_unary(self, unary):
+        parts = unary[1:-1].split(maxsplit=1)
+        operator, right = parts[0], parts[1]
+        right_value = self.evaluate(right)
+        if operator == "-":
+            return -right_value
+        elif operator == "!":
+            return not right_value
+        raise ValueError(f"Unknown unary operator: {operator}")
+
+    def visit_binary(self, binary):
+        return self.evaluate(binary)
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
