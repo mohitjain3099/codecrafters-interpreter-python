@@ -442,48 +442,68 @@ class Parser:
         return None
 
 class Interpreter:
-    
     def evaluate(self, expression: str):
+        # Direct evaluation for numbers
         if isinstance(expression, (int, float)):
             return expression
         elif isinstance(expression, str):
+            # Try to evaluate a single number string
             try:
                 return float(expression)
             except ValueError:
                 pass
             
+            # If the expression starts with "(" process it as a parsed expression
             if expression.startswith("("):
-                stack = []
-                tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
-                for char in tokenexpression:
-                    if char == '(':
-                        stack.append(char)
-                    elif char == ')':
-                        sub_expr = []
-                        while stack and stack[-1] != '(':
-                            sub_expr.append(stack.pop())
-                        if stack:
-                            stack.pop()  # Remove the '('
-                        if len(sub_expr) == 1:
-                            stack.append(sub_expr[0])
-                        elif len(sub_expr) == 3:
-                            right, operator, left = sub_expr
-                            result = self.do_operation(float(left), operator, float(right))
-                            stack.append(str(result))
-                        else:
-                            raise ValueError(f"Invalid expression: {sub_expr}")
-                    elif char == "group":
-                        continue  # Ignore 'group' keyword
-                    else:
-                        stack.append(char)
-                
-                if len(stack) != 1:
-                    raise ValueError(f"Invalid expression: {expression}")
-                return float(stack[0])
+                return self.parse_expression(expression)
             else:
-                return expression
-
+                raise ValueError(f"Invalid expression: {expression}")
+    
+    def parse_expression(self, expression):
+        """ This function handles parsed expressions such as (/ (* 18 3) (group (* 3 6))) """
+        # Tokenize the expression by spaces, ensuring parentheses are separated
+        tokens = expression.replace("(", " ( ").replace(")", " ) ").split()
+        return self.process_tokens(tokens)
+    
+    def process_tokens(self, tokens):
+        """ Process the tokens and return the evaluated result. """
+        if len(tokens) == 0:
+            raise ValueError("Empty expression")
+        
+        token = tokens.pop(0)
+        
+        if token == '(':
+            sub_expr = []
+            while tokens[0] != ')':
+                sub_expr.append(tokens.pop(0))
+            tokens.pop(0)  # Remove the closing ')'
+            
+            # Now we have the subexpression, we need to evaluate it
+            return self.evaluate_subexpression(sub_expr)
+        else:
+            # If the token is not a parenthesis, treat it as a literal
+            try:
+                return float(token)
+            except ValueError:
+                return token
+    
+    def evaluate_subexpression(self, sub_expr):
+        """ This function evaluates subexpressions like (* 18 3) """
+        if len(sub_expr) < 3:
+            raise ValueError(f"Invalid subexpression: {sub_expr}")
+        
+        operator = sub_expr[0]  # First item is the operator
+        left = sub_expr[1]  # Second item is the left operand
+        right = sub_expr[2]  # Third item is the right operand
+        
+        # Evaluate both sides if they are expressions
+        left_value = self.evaluate(left)
+        right_value = self.evaluate(right)
+        
+        return self.do_operation(left_value, operator, right_value)
+    
     def do_operation(self, left, operator, right):
+        """ Perform the binary operation """
         if operator == "+":
             return left + right
         elif operator == "-":
@@ -508,25 +528,13 @@ class Interpreter:
             return left and right
         elif operator == "or":
             return left or right
-        raise ValueError(f"Unknown operator: {operator}")
-    def visit_literal(self, literal):
-        return literal
+        else:
+            raise ValueError(f"Unknown operator: {operator}")
 
     def visit_grouping(self, grouping):
-        return self.evaluate(grouping[7:-1])  # Remove "(group " and ")"
-
-    def visit_unary(self, unary):
-        parts = unary[1:-1].split(maxsplit=1)
-        operator, right = parts[0], parts[1]
-        right_value = self.evaluate(right)
-        if operator == "-":
-            return -right_value
-        elif operator == "!":
-            return not right_value
-        raise ValueError(f"Unknown unary operator: {operator}")
-
-    def visit_binary(self, binary):
-        return self.evaluate(binary)
+        """ Handle expressions with group, such as (group (* 3 6)) """
+        expression_inside_group = grouping[7:-1]  # Strip "(group " and ")"
+        return self.evaluate(expression_inside_group)
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
