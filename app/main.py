@@ -452,7 +452,7 @@ class Interpreter:
                 pass
             
         if expression.startswith("("):
-            parts = expression[1:-1].split(maxsplit=2)
+            parts = expression[1:-1].replace("(", " ( ").replace(")", " ) ").split(maxsplit=2)
             if len(parts) < 2:
                 raise ValueError(f"Invalid expression: {expression}")
             
