@@ -442,7 +442,9 @@ class Parser:
         return None
 
 class Interpreter:
+    
     def evaluate(self, expression: str):
+        """Evaluate a given expression with nested subexpressions."""
         if isinstance(expression, (int, float)):
             return expression
         elif isinstance(expression, str):
@@ -452,34 +454,51 @@ class Interpreter:
                 pass
             
             if expression.startswith("("):
-                # Find the innermost expression
-                stack =[]
+                stack = []
                 tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
-                i=0
+                i = 0
                 while i < len(tokenexpression):
-                    if tokenexpression[i] == "(":
-                        i+=1
-                        continue
-                    elif tokenexpression[i] == ")":
+                    token = tokenexpression[i]
+                    
+                    if token == "(":
+                        i += 1
+                        continue  # Skip the open parenthesis
+                    elif token == ")":
+                        # Pop two operands and one operator from the stack
                         right = float(stack.pop())
                         left = float(stack.pop())
                         operator = stack.pop()
+                        # Perform the operation and push the result back to the stack
                         stack.append(self.do_operation(left, operator, right))
-                    elif tokenexpression[i]=="group":
-                        i+=1
-                        subexpression= ""
-                        while tokenexpression[i]!=")":
-                            subexpression+=tokenexpression[i]
-                            i+=1
-                        subexpression += ")"
-                        stack.append(self.evaluate(subexpression))
+                    elif token == "group":
+                        i += 1
+                        subexpression = []
+                        depth = 1
+                        while depth > 0:
+                            subtoken = tokenexpression[i]
+                            if subtoken == "(":
+                                depth += 1
+                            elif subtoken == ")":
+                                depth -= 1
+                            if depth > 0:
+                                subexpression.append(subtoken)
+                            i += 1
+                        # Recursively evaluate the subexpression and push the result
+                        subexpression_str = " ".join(subexpression)
+                        stack.append(self.evaluate(f"({subexpression_str})"))
                     else:
-                        stack.append(tokenexpression[i])
-                    i+=1
-                return stack[0]
+                        stack.append(token)
+                    i += 1
+                
+                if len(stack) != 1:
+                    raise ValueError("Invalid expression, stack not fully reduced")
+                
+                return float(stack[0])
             else:
                 return expression
+
     def do_operation(self, left, operator, right):
+        """Perform basic arithmetic operations."""
         if operator == "+":
             return left + right
         elif operator == "-":
@@ -487,24 +506,11 @@ class Interpreter:
         elif operator == "*":
             return left * right
         elif operator == "/":
+            if right == 0:
+                raise ZeroDivisionError("Division by zero is undefined")
             return left / right
-        elif operator == "==":
-            return left == right
-        elif operator == "!=":
-            return left != right
-        elif operator == "<":
-            return left < right
-        elif operator == "<=":
-            return left <= right
-        elif operator == ">":
-            return left > right
-        elif operator == ">=":
-            return left >= right
-        elif operator == "and":
-            return left and right
-        elif operator == "or":
-            return left or right
-        raise ValueError(f"Unknown operator: {operator}")
+        else:
+            raise ValueError(f"Unknown operator: {operator}")
     def visit_literal(self, literal):
         return literal
 
