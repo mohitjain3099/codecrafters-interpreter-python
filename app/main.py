@@ -485,7 +485,8 @@ class Interpreter:
                             i += 1
                         # Recursively evaluate the subexpression and push the result
                         subexpression_str = " ".join(subexpression)
-                        stack.append(self.evaluate(f"({subexpression_str})"))
+                        stack.append(self.evaluate(f"{subexpression_str}"))
+                        i -= 1
                     else:
                         stack.append(token)
                     i += 1
