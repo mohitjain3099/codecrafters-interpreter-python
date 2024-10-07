@@ -451,15 +451,17 @@ class Interpreter:
                 return expression
 
         stack = []
-        tokens = expression[1:-1].replace('(', ' ( ').replace(')', ' ) ').split()
+        tokens = expression[1:-1].split()
         
-        for token in reversed(tokens):
-            if token == '(':
-                operation = stack.pop()
+        for token in tokens:
+            if token == ')':
                 right = stack.pop()
                 left = stack.pop()
-                result = self.apply_operation(operation, left, right)
+                operator = stack.pop()
+                result = self.apply_operation(operator, left, right)
                 stack.append(result)
+            elif token == '(':
+                continue
             else:
                 stack.append(token)
 
