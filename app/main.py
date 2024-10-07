@@ -459,8 +459,8 @@ class Interpreter:
                     if char=='(':
                         continue
                     elif char==')':
-                        right = int(stack.pop())
-                        left = int(stack.pop())
+                        right = float(stack.pop())
+                        left = float(stack.pop())
                         operator = stack.pop()
                         stack.append(self.do_operation(left, operator, right))
                     else:
