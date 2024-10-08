@@ -466,7 +466,9 @@ class Interpreter:
                         continue  # Skip the open parenthesis
                     elif token == ")":
                         # Pop two operands and one operator from the stack
-                        right = float(stack.pop())
+                        right = stack.pop()
+                        if right not in [True, False]:
+                            right = float(right)
                         left = stack.pop()
                         try:
                             left = float(left)
@@ -497,6 +499,9 @@ class Interpreter:
                         subexpression_str = " ".join(subexpression)
                         stack.append(self.evaluate(f"{subexpression_str}"))
                         i -= 1
+                    elif token in ["true", "false"]:
+                        # Handle boolean literals
+                        stack.append(True if token == "true" else False)
                     else:
                         stack.append(token)
                     i += 1
@@ -504,7 +509,7 @@ class Interpreter:
                 if len(stack) != 1:
                     raise ValueError("Invalid expression, stack not fully reduced")
                 
-                return float(stack[0])
+                return stack[0]
             else:
                 return expression
 
@@ -606,4 +611,17 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    main()
+        # lex = Lexer("!true")
+        # tokens = []
+        # while lex.i <= lex.size:
+        #     token = lex.next_token()
+        #     if token.type != TOKEN_TYPE.NONE:
+        #         tokens.append(token)
+        # par = Parser(tokens)
+        # expression = par.parse()
+        # if expression:
+        #     print(expression)
+        # interpreter = Interpreter()
+        # value = interpreter.evaluate(expression)
+        # print(value)
+        main()
