@@ -459,8 +459,7 @@ class Interpreter:
                 i = 0
                 unary_or_binary = None
                 while i < len(tokenexpression):
-                    token = tokenexpression[i]
-                    
+                    token = tokenexpression[i]                    
                     if token == "(":
                         i += 1
                         continue  # Skip the open parenthesis
@@ -468,15 +467,23 @@ class Interpreter:
                         # Pop two operands and one operator from the stack
                         right = stack.pop()
                         if right not in [True, False]:
-                            right = float(right)
+                            try:
+                                right = float(right)
+                            except:
+                                pass 
                         left = stack.pop()
-                        try:
-                            left = float(left)
-                            operator = stack.pop()
-                            unary_or_binary = "binary"
-                        except:
-                            unary_or_binary = "unary"
-                            operator = left
+                        if left not in [True, False]:
+                            try:
+                                left = float(left)
+                                operator = stack.pop()
+                                unary_or_binary = "binary"
+                            except:
+                                if left in ["!", "-"]:
+                                    unary_or_binary = "unary"
+                                    operator = left
+                                else:
+                                    unary_or_binary = "binary"
+                                    operator = stack.pop()
                         if unary_or_binary == "unary":
                             stack.append(self.do_unary(operator, right))
                         elif unary_or_binary == "binary":
@@ -611,7 +618,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        # lex = Lexer("!nil")
+        # lex = Lexer("!true")
         # tokens = []
         # while lex.i <= lex.size:
         #     token = lex.next_token()
@@ -624,5 +631,5 @@ if __name__ == "__main__":
         # interpreter = Interpreter()
         # value = interpreter.evaluate(expression)
         # print(value)
-        main()
+    main()
         
