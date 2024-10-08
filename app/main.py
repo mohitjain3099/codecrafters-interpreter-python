@@ -467,23 +467,28 @@ class Interpreter:
                         # Pop two operands and one operator from the stack
                         right = stack.pop()
                         if not isinstance(right, bool):
-                            try:
-                                right = float(right)
-                            except:
-                                pass 
+                            if not self.is_integer(right):
+                                try:
+                                    right = float(right)
+                                except:
+                                    pass
                         left = stack.pop()
                         if not isinstance(left, bool):
-                            try:
-                                left = float(left)
-                                operator = stack.pop()
-                                unary_or_binary = "binary"
-                            except:
-                                if left in ["!", "-"]:
-                                    unary_or_binary = "unary"
-                                    operator = left
-                                else:
-                                    unary_or_binary = "binary"
+                            if not self.is_integer(left):
+                                try:
+                                    left = float(left)
                                     operator = stack.pop()
+                                    unary_or_binary = "binary"
+                                except:
+                                    if left in ["!", "-"]:
+                                        unary_or_binary = "unary"
+                                        operator = left
+                                    else:
+                                        unary_or_binary = "binary"
+                                        operator = stack.pop()
+                            else:
+                                unary_or_binary = "binary"
+                                operator = stack.pop()
                         if unary_or_binary == "unary":
                             stack.append(self.do_unary(operator, right))
                         elif unary_or_binary == "binary":
@@ -506,7 +511,7 @@ class Interpreter:
                         subexpression_str = " ".join(subexpression)
                         stack.append(self.evaluate(f"{subexpression_str}"))
                         i -= 1
-                    elif token in ["true", "false", "nil"]:
+                    elif token in {"true", "false", "nil"}:
                         # Handle boolean literals
                         stack.append(True if token == "true" else False)
                     else:
@@ -521,7 +526,22 @@ class Interpreter:
                 return expression
 
     def do_operation(self, left, operator, right):
-        """Perform basic arithmetic operations."""
+        """Perform basic arithmetic operations.""" 
+        
+        if operator in ["==", "!=", "<", ">", "<=", ">="]:
+            if operator == "==":
+                return left == right
+            elif operator == "!=":
+                return left != right
+            elif operator == "<":
+                return left < right
+            elif operator == ">":
+                return left > right
+            elif operator == "<=":
+                return left <= right
+            elif operator == ">=":
+                return left >= right
+            
         if isinstance(left, str) ^ isinstance(right, str):
             if isinstance(left, str):
                 try :
@@ -565,6 +585,13 @@ class Interpreter:
             return not right
         else:
             raise ValueError(f"Unknown unary operator: {operator}")
+        
+    def is_integer(self, value: str):
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
     def visit_literal(self, literal):
         return literal
 
@@ -641,7 +668,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        # lex = Lexer("70 > -158")
+        # lex = Lexer("\"80\"==80")
         # tokens = []
         # while lex.i <= lex.size:
         #     token = lex.next_token()
