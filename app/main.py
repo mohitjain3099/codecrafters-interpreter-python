@@ -457,6 +457,7 @@ class Interpreter:
                 stack = []
                 tokenexpression = expression.replace("(", " ( ").replace(")", " ) ").split()
                 i = 0
+                unary_or_binary = None
                 while i < len(tokenexpression):
                     token = tokenexpression[i]
                     
@@ -466,10 +467,19 @@ class Interpreter:
                     elif token == ")":
                         # Pop two operands and one operator from the stack
                         right = float(stack.pop())
-                        left = float(stack.pop())
-                        operator = stack.pop()
+                        left = stack.pop()
+                        try:
+                            left = float(left)
+                            operator = stack.pop()
+                            unary_or_binary = "binary"
+                        except:
+                            unary_or_binary = "unary"
+                            operator = left
+                        if unary_or_binary == "unary":
+                            stack.append(self.do_unary(operator, right))
+                        elif unary_or_binary == "binary":
+                            stack.append(self.do_operation(left, operator, right))
                         # Perform the operation and push the result back to the stack
-                        stack.append(self.do_operation(left, operator, right))
                     elif token == "group":
                         i += 1
                         subexpression = []
@@ -512,6 +522,14 @@ class Interpreter:
             return left / right
         else:
             raise ValueError(f"Unknown operator: {operator}")
+    def do_unary(self, operator, right):
+        """Perform unary operations."""
+        if operator == "-":
+            return -right
+        elif operator == "!":
+            return not right
+        else:
+            raise ValueError(f"Unknown unary operator: {operator}")
     def visit_literal(self, literal):
         return literal
 
