@@ -672,18 +672,18 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        lex = Lexer("-true")
-        tokens = []
-        while lex.i <= lex.size:
-            token = lex.next_token()
-            if token.type != TOKEN_TYPE.NONE:
-                tokens.append(token)
-        par = Parser(tokens)
-        expression = par.parse()
-        if expression:
-            print(expression)
-        interpreter = Interpreter()
-        value = interpreter.evaluate(expression)
-        print(value)
-    # main()
+        # lex = Lexer("-true")
+        # tokens = []
+        # while lex.i <= lex.size:
+        #     token = lex.next_token()
+        #     if token.type != TOKEN_TYPE.NONE:
+        #         tokens.append(token)
+        # par = Parser(tokens)
+        # expression = par.parse()
+        # if expression:
+        #     print(expression)
+        # interpreter = Interpreter()
+        # value = interpreter.evaluate(expression)
+        # print(value)
+    main()
         
