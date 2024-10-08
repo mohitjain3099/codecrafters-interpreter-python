@@ -522,6 +522,17 @@ class Interpreter:
 
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations."""
+        if isinstance(left, str) ^ isinstance(right, str):
+            if isinstance(left, str):
+                try :
+                    right = str(int(right))
+                except:
+                    right = str(right)
+            else:
+                try:
+                    left = str(int(left))
+                except:
+                    left = str(left)
         if operator == "+":
             return left + right
         elif operator == "-":
@@ -618,7 +629,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        # lex = Lexer("!true")
+        # lex = Lexer("\"one\" + \"2\"")
         # tokens = []
         # while lex.i <= lex.size:
         #     token = lex.next_token()
