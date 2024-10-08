@@ -580,7 +580,7 @@ class Interpreter:
     def do_unary(self, operator, right):
         """Perform unary operations."""
         global exit_code
-        if not isinstance(right, int, float):
+        if not isinstance(right, (int, float)):
             exit_code = 70
             return ""
         if operator == "-":
