@@ -466,13 +466,13 @@ class Interpreter:
                     elif token == ")":
                         # Pop two operands and one operator from the stack
                         right = stack.pop()
-                        if right not in [True, False]:
+                        if not isinstance(right, bool):
                             try:
                                 right = float(right)
                             except:
                                 pass 
                         left = stack.pop()
-                        if left not in [True, False]:
+                        if not isinstance(left, bool):
                             try:
                                 left = float(left)
                                 operator = stack.pop()
@@ -629,7 +629,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        # lex = Lexer("\"one\" + \"2\"")
+        # lex = Lexer("(-84 + 84) * (82 * 41)/ (1 + 4)")
         # tokens = []
         # while lex.i <= lex.size:
         #     token = lex.next_token()
