@@ -579,6 +579,10 @@ class Interpreter:
             raise ValueError(f"Unknown operator: {operator}")
     def do_unary(self, operator, right):
         """Perform unary operations."""
+        global exit_code
+        if isinstance(right, str):
+            exit_code = 70
+            return ("Operand must be a number")
         if operator == "-":
             return -right
         elif operator == "!":
