@@ -499,7 +499,7 @@ class Interpreter:
                         subexpression_str = " ".join(subexpression)
                         stack.append(self.evaluate(f"{subexpression_str}"))
                         i -= 1
-                    elif token in ["true", "false"]:
+                    elif token in ["true", "false", "nil"]:
                         # Handle boolean literals
                         stack.append(True if token == "true" else False)
                     else:
@@ -611,7 +611,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        # lex = Lexer("!true")
+        # lex = Lexer("!nil")
         # tokens = []
         # while lex.i <= lex.size:
         #     token = lex.next_token()
@@ -625,3 +625,4 @@ if __name__ == "__main__":
         # value = interpreter.evaluate(expression)
         # print(value)
         main()
+        
