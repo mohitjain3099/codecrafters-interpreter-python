@@ -582,7 +582,7 @@ class Interpreter:
         global exit_code
         if isinstance(right, str):
             exit_code = 70
-            return ("Operand must be a number")
+            return ""
         if operator == "-":
             return -right
         elif operator == "!":
