@@ -527,8 +527,9 @@ class Interpreter:
 
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations.""" 
-        
-        if operator in ["==", "!=", "<", ">", "<=", ">="] and type(left)==type(right):
+        if operator in {"==", "!=", "<", ">", "<=", ">="}:
+            if type(left) != type(right):
+                return False
             if operator == "==":
                 return left == right
             elif operator == "!=":
@@ -563,18 +564,6 @@ class Interpreter:
             if right == 0:
                 raise ZeroDivisionError("Division by zero is undefined")
             return left / right
-        elif operator == "==":
-            return left == right
-        elif operator == "!=":
-            return left != right
-        elif operator == "<":
-            return left < right
-        elif operator == ">":
-            return left > right
-        elif operator == "<=":
-            return left <= right
-        elif operator == ">=":
-            return left >= right
         else:
             raise ValueError(f"Unknown operator: {operator}")
     def do_unary(self, operator, right):
@@ -672,18 +661,18 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        # lex = Lexer("29 > -78")
-        # tokens = []
-        # while lex.i <= lex.size:
-        #     token = lex.next_token()
-        #     if token.type != TOKEN_TYPE.NONE:
-        #         tokens.append(token)
-        # par = Parser(tokens)
-        # expression = par.parse()
-        # if expression:
-        #     print(expression)
-        # interpreter = Interpreter()
-        # value = interpreter.evaluate(expression)
-        # print(value)
-    main()
+    lex = Lexer("18==\"18\"")
+    tokens = []
+    while lex.i <= lex.size:
+        token = lex.next_token()
+        if token.type != TOKEN_TYPE.NONE:
+            tokens.append(token)
+    par = Parser(tokens)
+    expression = par.parse()
+    if expression:
+        print(expression)
+    interpreter = Interpreter()
+    value = interpreter.evaluate(expression)
+    print(value)
+    # main()
         
