@@ -527,6 +527,7 @@ class Interpreter:
 
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations.""" 
+        global exit_code
         if operator in {"==", "!=", "<", ">", "<=", ">="}:
             if type(left) != type(right):
                 return False
@@ -542,18 +543,22 @@ class Interpreter:
                 return left <= right
             elif operator == ">=":
                 return left >= right
+        if not type(left) in {int, float} or not type(right) in {int, float}:
+            try :
+                left = int(left)
+                right = int(right)
+            except:
+                left = str(left)
+                right = str(right)
             
-        if isinstance(left, str) ^ isinstance(right, str):
-            if isinstance(left, str):
-                try :
-                    right = str(int(right))
-                except:
-                    right = str(right)
+            if operator == "+":
+                return str(left) + str(right)
+            elif operator == "*" and (isinstance(left, int) or isinstance(right, int)):
+                return left * right
             else:
-                try:
-                    left = str(int(left))
-                except:
-                    left = str(left)
+                exit_code = 70
+                return ""
+                
         if operator == "+":
             return left + right
         elif operator == "-":
@@ -667,7 +672,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("-true")
+    # lex = Lexer("4 + 4 * 2")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
