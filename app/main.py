@@ -528,7 +528,7 @@ class Interpreter:
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations.""" 
         
-        if operator in ["==", "!=", "<", ">", "<=", ">="]:
+        if operator in ["==", "!=", "<", ">", "<=", ">="] and type(left)==type(right):
             if operator == "==":
                 return left == right
             elif operator == "!=":
