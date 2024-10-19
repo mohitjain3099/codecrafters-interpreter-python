@@ -528,9 +528,6 @@ class Interpreter:
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations.""" 
         
-        left = self.convert_to_number(left)
-        right = self.convert_to_number(right)
-
         if operator in ["==", "!=", "<", ">", "<=", ">="]:
             if operator == "==":
                 return left == right
@@ -544,7 +541,18 @@ class Interpreter:
                 return left <= right
             elif operator == ">=":
                 return left >= right
-        
+            
+        if isinstance(left, str) ^ isinstance(right, str):
+            if isinstance(left, str):
+                try :
+                    right = str(int(right))
+                except:
+                    right = str(right)
+            else:
+                try:
+                    left = str(int(left))
+                except:
+                    left = str(left)
         if operator == "+":
             return left + right
         elif operator == "-":
@@ -555,26 +563,26 @@ class Interpreter:
             if right == 0:
                 raise ZeroDivisionError("Division by zero is undefined")
             return left / right
+        elif operator == "==":
+            return left == right
+        elif operator == "!=":
+            return left != right
+        elif operator == "<":
+            return left < right
+        elif operator == ">":
+            return left > right
+        elif operator == "<=":
+            return left <= right
+        elif operator == ">=":
+            return left >= right
         else:
             raise ValueError(f"Unknown operator: {operator}")
-
-    def convert_to_number(self, value):
-        """Convert a value to a number if possible."""
-        if isinstance(value, (int, float)):
-            return value
-        elif isinstance(value, str):
-            try:
-                return int(value)
-            except ValueError:
-                try:
-                    return float(value)
-                except ValueError:
-                    return value
-        return value
-
     def do_unary(self, operator, right):
         """Perform unary operations."""
-        right = self.convert_to_number(right)
+        global exit_code
+        if not isinstance(right, int) or not isinstance(right, float):
+            exit_code = 70
+            return ""
         if operator == "-":
             return -right
         elif operator == "!":
@@ -582,16 +590,12 @@ class Interpreter:
         else:
             raise ValueError(f"Unknown unary operator: {operator}")
         
-    def is_integer(self, value):
-        if isinstance(value, int):
+    def is_integer(self, value: str):
+        try:
+            int(value)
             return True
-        if isinstance(value, str):
-            try:
-                int(value)
-                return True
-            except ValueError:
-                return False
-        return False
+        except ValueError:
+            return False
     def visit_literal(self, literal):
         return literal
 
@@ -668,18 +672,18 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-        # lex = Lexer("29 > -78")
-        # tokens = []
-        # while lex.i <= lex.size:
-        #     token = lex.next_token()
-        #     if token.type != TOKEN_TYPE.NONE:
-        #         tokens.append(token)
-        # par = Parser(tokens)
-        # expression = par.parse()
-        # if expression:
-        #     print(expression)
-        # interpreter = Interpreter()
-        # value = interpreter.evaluate(expression)
-        # print(value)
-    main()
+        lex = Lexer("29 > -78")
+        tokens = []
+        while lex.i <= lex.size:
+            token = lex.next_token()
+            if token.type != TOKEN_TYPE.NONE:
+                tokens.append(token)
+        par = Parser(tokens)
+        expression = par.parse()
+        if expression:
+            print(expression)
+        interpreter = Interpreter()
+        value = interpreter.evaluate(expression)
+        print(value)
+    # main()
         
