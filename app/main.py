@@ -569,6 +569,12 @@ class Interpreter:
     def do_unary(self, operator, right):
         """Perform unary operations."""
         global exit_code
+        if isinstance(right, bool):
+            if operator == "!":
+                return not right
+            else:
+                exit_code = 70
+                return ""
         if not isinstance(right, int) and not isinstance(right, float):
             exit_code = 70
             return ""
@@ -661,7 +667,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("87 > -164")
+    # lex = Lexer("-true")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
