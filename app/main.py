@@ -489,6 +489,9 @@ class Interpreter:
                             else:
                                 unary_or_binary = "binary"
                                 operator = stack.pop()
+                        else:
+                            unary_or_binary = "binary"
+                            operator = stack.pop()
                         if unary_or_binary == "unary":
                             stack.append(self.do_unary(operator, right))
                         elif unary_or_binary == "binary":
@@ -672,7 +675,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("4 + 4 * 2")
+    # lex = Lexer("true/true")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
