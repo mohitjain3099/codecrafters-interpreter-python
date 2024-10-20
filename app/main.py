@@ -547,9 +547,14 @@ class Interpreter:
             elif operator == ">=":
                 return left >= right
         if not type(left) in {int, float} or not type(right) in {int, float}:
+            
             try :
-                left = int(left)
-                right = int(right)
+                if not isinstance(left, bool) and not isinstance(right, bool):
+                    left = int(left)
+                    right = int(right)
+                else:
+                    exit_code = 70
+                    return ""
             except:
                 left = str(left)
                 right = str(right)
@@ -675,18 +680,18 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("true/true")
-    # tokens = []
-    # while lex.i <= lex.size:
-    #     token = lex.next_token()
-    #     if token.type != TOKEN_TYPE.NONE:
-    #         tokens.append(token)
-    # par = Parser(tokens)
-    # expression = par.parse()
-    # if expression:
-    #     print(expression)
-    # interpreter = Interpreter()
-    # value = interpreter.evaluate(expression)
-    # print(value)
-    main()
+    lex = Lexer("false + \"foo\"")
+    tokens = []
+    while lex.i <= lex.size:
+        token = lex.next_token()
+        if token.type != TOKEN_TYPE.NONE:
+            tokens.append(token)
+    par = Parser(tokens)
+    expression = par.parse()
+    if expression:
+        print(expression)
+    interpreter = Interpreter()
+    value = interpreter.evaluate(expression)
+    print(value)
+    # main()
         
