@@ -531,8 +531,12 @@ class Interpreter:
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations.""" 
         global exit_code
-        
+        if operator in ["+", "-", "*", "/"]:
+            op_type= "arithmetic"
+        else:
+            op_type = "comparison"
         def handle_comparison(left, operator, right):
+            global exit_code
             if operator == "==":
                 return left == right
             elif operator == "!=":
@@ -546,9 +550,11 @@ class Interpreter:
             elif operator == ">=":
                 return left >= right
             else:
-                raise ValueError(f"Unknown operator: {operator}")
+                exit_code = 70
+                return ""
 
         def handle_arithmetic(left, operator, right):
+            global exit_code
             if operator == "+":
                 return left + right
             elif operator == "-":
@@ -560,60 +566,28 @@ class Interpreter:
                     raise ZeroDivisionError("Division by zero is undefined")
                 return left / right
             else:
-                raise ValueError(f"Unknown operator: {operator}")
+                exit_code = 70
+                return ""
 
-        try:
-            if isinstance(left, str) or isinstance(right, str):
-                if isinstance(left, str) and isinstance(right, str):
-                    if operator == "+":
-                        return left + right
-                    else:
-                        return handle_comparison(left, operator, right)
-                else: 
-                    exit_code = 70
-                    return ""
-            
-            if isinstance(left, bool) or isinstance(right, bool):
-                left = bool(left)
-                right = bool(right)
+        if isinstance(left, bool) and isinstance(right, bool):
+            return handle_comparison(left, operator, right)
+        if isinstance(left, str) and isinstance(right, str):
+            if operator == "+":
+                return left + right
+            else:
                 return handle_comparison(left, operator, right)
-            
-            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
-                if operator in {"==", "!=", "<", ">", "<=", ">="}:
-                    return handle_comparison(left, operator, right)
-                else:
-                    return handle_arithmetic(left, operator, right)
-            
-            if isinstance(left, (int, float)) and isinstance(right, str):
-                right = float(right)
+        if isinstance(left, (int,float)) and isinstance(right, (int,float)):
+            if op_type == "arithmetic":
                 return handle_arithmetic(left, operator, right)
-            
-            if isinstance(left, str) and isinstance(right, (int, float)):
-                left = float(left)
-                return handle_arithmetic(left, operator, right)
-            
-            if isinstance(left, bool) and isinstance(right, (int, float)):
-                left = int(left)
-                return handle_arithmetic(left, operator, right)
-            
-            if isinstance(left, (int, float)) and isinstance(right, bool):
-                right = int(right)
-                return handle_arithmetic(left, operator, right)
-            
-            if isinstance(left, bool) and isinstance(right, str):
-                left = str(int(left))
+            elif op_type == "comparison":
                 return handle_comparison(left, operator, right)
-            
-            if isinstance(left, str) and isinstance(right, bool):
-                right = str(int(right))
-                return handle_comparison(left, operator, right)
-            
-        except Exception as e:
+        if type(left) != type(right):
             exit_code = 70
-            return str(e)
+            return ""
         
-        exit_code = 70
-        return ""
+        
+        
+        
     def do_unary(self, operator, right):
         """Perform unary operations."""
         global exit_code
