@@ -571,17 +571,23 @@ class Interpreter:
 
         if isinstance(left, bool) and isinstance(right, bool):
             return handle_comparison(left, operator, right)
-        if isinstance(left, str) and isinstance(right, str):
+        elif isinstance(left, (int,float)) and isinstance(right, bool):
+            exit_code = 70
+            return ""
+        elif isinstance(left, bool) and isinstance(right, (int,float)):
+            exit_code = 70
+            return ""
+        elif isinstance(left, str) and isinstance(right, str):
             if operator == "+":
                 return left + right
             else:
                 return handle_comparison(left, operator, right)
-        if isinstance(left, (int,float)) and isinstance(right, (int,float)):
+        elif isinstance(left, (int,float)) and isinstance(right, (int,float)):
             if op_type == "arithmetic":
                 return handle_arithmetic(left, operator, right)
             elif op_type == "comparison":
                 return handle_comparison(left, operator, right)
-        if type(left) != type(right):
+        elif type(left) != type(right):
             exit_code = 70
             return ""
         
@@ -689,7 +695,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("86 == \"86\"")
+    # lex = Lexer("false <= (23 + 94)")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
