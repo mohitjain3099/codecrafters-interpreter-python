@@ -531,44 +531,8 @@ class Interpreter:
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations.""" 
         global exit_code
-        if not type(left) in {int, float} or not type(right) in {int, float}:
-            try :
-                if isinstance(left, str) and isinstance(right, str):
-                    if operator == "+":
-                        return left + right
-                if operator == "==":
-                    return left == right
-                elif operator == "!=":
-                    return left != right
-                elif operator == "<":
-                    return left < right
-                elif operator == ">":
-                    return left > right
-                elif operator == "<=":
-                    return left <= right
-                elif operator == ">=":
-                    return left >= right    
-                    
-                elif not isinstance(left, bool) and not isinstance(right, bool):
-                    left = int(left)
-                    right = int(right)
-                else:
-                    exit_code = 70
-                    return ""
-            except:
-                exit_code = 70
-                return ""
-            
-            if operator == "+":
-                return str(left) + str(right)
-            elif operator == "*" and (isinstance(left, int) or isinstance(right, int)):
-                return left * right
-            else:
-                exit_code = 70
-                return ""
-        if operator in {"==", "!=", "<", ">", "<=", ">="}:
-            if type(left) != type(right):
-                return False
+        
+        def handle_comparison(left, operator, right):
             if operator == "==":
                 return left == right
             elif operator == "!=":
@@ -581,19 +545,79 @@ class Interpreter:
                 return left <= right
             elif operator == ">=":
                 return left >= right
-                
-        if operator == "+":
-            return left + right
-        elif operator == "-":
-            return left - right
-        elif operator == "*":
-            return left * right
-        elif operator == "/":
-            if right == 0:
-                raise ZeroDivisionError("Division by zero is undefined")
-            return left / right
-        else:
-            raise ValueError(f"Unknown operator: {operator}")
+            else:
+                raise ValueError(f"Unknown operator: {operator}")
+
+        def handle_arithmetic(left, operator, right):
+            if operator == "+":
+                return left + right
+            elif operator == "-":
+                return left - right
+            elif operator == "*":
+                return left * right
+            elif operator == "/":
+                if right == 0:
+                    raise ZeroDivisionError("Division by zero is undefined")
+                return left / right
+            else:
+                raise ValueError(f"Unknown operator: {operator}")
+
+        try:
+            if isinstance(left, str) or isinstance(right, str):
+                if isinstance(left, str) and isinstance(right, str):
+                    if operator == "+":
+                        return left + right
+                    else:
+                        return handle_comparison(left, operator, right)
+                else:
+                    left = str(left)
+                    right = str(right)
+                    if operator == "+":
+                        return left + right
+                    else:
+                        return handle_comparison(left, operator, right)
+            
+            if isinstance(left, bool) or isinstance(right, bool):
+                left = bool(left)
+                right = bool(right)
+                return handle_comparison(left, operator, right)
+            
+            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                if operator in {"==", "!=", "<", ">", "<=", ">="}:
+                    return handle_comparison(left, operator, right)
+                else:
+                    return handle_arithmetic(left, operator, right)
+            
+            if isinstance(left, (int, float)) and isinstance(right, str):
+                right = float(right)
+                return handle_arithmetic(left, operator, right)
+            
+            if isinstance(left, str) and isinstance(right, (int, float)):
+                left = float(left)
+                return handle_arithmetic(left, operator, right)
+            
+            if isinstance(left, bool) and isinstance(right, (int, float)):
+                left = int(left)
+                return handle_arithmetic(left, operator, right)
+            
+            if isinstance(left, (int, float)) and isinstance(right, bool):
+                right = int(right)
+                return handle_arithmetic(left, operator, right)
+            
+            if isinstance(left, bool) and isinstance(right, str):
+                left = str(int(left))
+                return handle_comparison(left, operator, right)
+            
+            if isinstance(left, str) and isinstance(right, bool):
+                right = str(int(right))
+                return handle_comparison(left, operator, right)
+            
+        except Exception as e:
+            exit_code = 70
+            return str(e)
+        
+        exit_code = 70
+        return ""
     def do_unary(self, operator, right):
         """Perform unary operations."""
         global exit_code
