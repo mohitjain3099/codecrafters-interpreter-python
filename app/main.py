@@ -552,6 +552,9 @@ class Interpreter:
                 if not isinstance(left, bool) and not isinstance(right, bool):
                     left = int(left)
                     right = int(right)
+                elif isinstance(left, str) and isinstance(right, str):
+                    if operator == "+":
+                        return left + right
                 else:
                     exit_code = 70
                     return ""
