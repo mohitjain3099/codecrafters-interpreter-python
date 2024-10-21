@@ -537,6 +537,19 @@ class Interpreter:
                 if isinstance(left, str) and isinstance(right, str):
                     if operator == "+":
                         return left + right
+                    elif operator == "==":
+                        return left == right
+                    elif operator == "!=":
+                        return left != right
+                    elif operator == "<":
+                        return left < right
+                    elif operator == ">":
+                        return left > right
+                    elif operator == "<=":
+                        return left <= right
+                    elif operator == ">=":
+                        return left >= right
+                    
                 elif not isinstance(left, bool) and not isinstance(right, bool):
                     left = int(left)
                     right = int(right)
