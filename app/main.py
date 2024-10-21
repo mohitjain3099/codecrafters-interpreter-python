@@ -570,7 +570,8 @@ class Interpreter:
                 return ""
 
         if isinstance(left, bool) and isinstance(right, bool):
-            return handle_comparison(left, operator, right)
+            exit_code = 70
+            return ""
         elif isinstance(left, (int,float)) and isinstance(right, bool):
             exit_code = 70
             return ""
