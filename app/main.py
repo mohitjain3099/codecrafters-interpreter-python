@@ -531,21 +531,6 @@ class Interpreter:
     def do_operation(self, left, operator, right):
         """Perform basic arithmetic operations.""" 
         global exit_code
-        if operator in {"==", "!=", "<", ">", "<=", ">="}:
-            if type(left) != type(right):
-                return False
-            if operator == "==":
-                return left == right
-            elif operator == "!=":
-                return left != right
-            elif operator == "<":
-                return left < right
-            elif operator == ">":
-                return left > right
-            elif operator == "<=":
-                return left <= right
-            elif operator == ">=":
-                return left >= right
         if not type(left) in {int, float} or not type(right) in {int, float}:
             
             try :
@@ -569,6 +554,21 @@ class Interpreter:
             else:
                 exit_code = 70
                 return ""
+        if operator in {"==", "!=", "<", ">", "<=", ">="}:
+            if type(left) != type(right):
+                return False
+            if operator == "==":
+                return left == right
+            elif operator == "!=":
+                return left != right
+            elif operator == "<":
+                return left < right
+            elif operator == ">":
+                return left > right
+            elif operator == "<=":
+                return left <= right
+            elif operator == ">=":
+                return left >= right
                 
         if operator == "+":
             return left + right
