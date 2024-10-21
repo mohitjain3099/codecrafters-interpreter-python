@@ -556,8 +556,8 @@ class Interpreter:
                     exit_code = 70
                     return ""
             except:
-                left = str(left)
-                right = str(right)
+                exit_code = 70
+                return ""
             
             if operator == "+":
                 return str(left) + str(right)
@@ -680,7 +680,7 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("false + \"foo\"")
+    # lex = Lexer("23 + \"bar\" + 3")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
