@@ -532,23 +532,22 @@ class Interpreter:
         """Perform basic arithmetic operations.""" 
         global exit_code
         if not type(left) in {int, float} or not type(right) in {int, float}:
-            
             try :
                 if isinstance(left, str) and isinstance(right, str):
                     if operator == "+":
                         return left + right
-                    elif operator == "==":
-                        return left == right
-                    elif operator == "!=":
-                        return left != right
-                    elif operator == "<":
-                        return left < right
-                    elif operator == ">":
-                        return left > right
-                    elif operator == "<=":
-                        return left <= right
-                    elif operator == ">=":
-                        return left >= right
+                if operator == "==":
+                    return left == right
+                elif operator == "!=":
+                    return left != right
+                elif operator == "<":
+                    return left < right
+                elif operator == ">":
+                    return left > right
+                elif operator == "<=":
+                    return left <= right
+                elif operator == ">=":
+                    return left >= right    
                     
                 elif not isinstance(left, bool) and not isinstance(right, bool):
                     left = int(left)
@@ -696,18 +695,18 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("\"quz\" + \"hello\"")
-    # tokens = []
-    # while lex.i <= lex.size:
-    #     token = lex.next_token()
-    #     if token.type != TOKEN_TYPE.NONE:
-    #         tokens.append(token)
-    # par = Parser(tokens)
-    # expression = par.parse()
-    # if expression:
-    #     print(expression)
-    # interpreter = Interpreter()
-    # value = interpreter.evaluate(expression)
-    # print(value)
-    main()
+    lex = Lexer("86 == \"86\"")
+    tokens = []
+    while lex.i <= lex.size:
+        token = lex.next_token()
+        if token.type != TOKEN_TYPE.NONE:
+            tokens.append(token)
+    par = Parser(tokens)
+    expression = par.parse()
+    if expression:
+        print(expression)
+    interpreter = Interpreter()
+    value = interpreter.evaluate(expression)
+    print(value)
+    # main()
         
