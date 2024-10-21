@@ -589,8 +589,13 @@ class Interpreter:
             elif op_type == "comparison":
                 return handle_comparison(left, operator, right)
         elif type(left) != type(right):
-            exit_code = 70
-            return ""
+            if operator == "==":
+                return False
+            elif operator == "!=":
+                return True
+            else:
+                exit_code = 70
+                return ""
         
         
         
