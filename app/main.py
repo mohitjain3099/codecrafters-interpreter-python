@@ -569,13 +569,9 @@ class Interpreter:
                         return left + right
                     else:
                         return handle_comparison(left, operator, right)
-                else:
-                    left = str(left)
-                    right = str(right)
-                    if operator == "+":
-                        return left + right
-                    else:
-                        return handle_comparison(left, operator, right)
+                else: 
+                    exit_code = 70
+                    return ""
             
             if isinstance(left, bool) or isinstance(right, bool):
                 left = bool(left)
