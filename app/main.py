@@ -471,8 +471,10 @@ class Interpreter:
             self.execute(statement)
 
     def execute(self, statement):
+        global exit_code
         if statement["type"] == "print":
             if statement["value"] is None:
+                exit_code = 65
                 print("")
             else:
                 value = self.evaluate(statement["value"])
