@@ -357,6 +357,9 @@ class Parser:
         return self.expression_statement()
 
     def print_statement(self):
+        if self.check(TOKEN_TYPE.SEMICOLON):
+            self.consume(TOKEN_TYPE.SEMICOLON, "Expect ';' after value.")
+            return {"type": "print", "value": None}
         value = self.expression()
         self.consume(TOKEN_TYPE.SEMICOLON, "Expect ';' after value.")
         return {"type": "print", "value": value}
@@ -469,8 +472,11 @@ class Interpreter:
 
     def execute(self, statement):
         if statement["type"] == "print":
-            value = self.evaluate(statement["value"])
-            print(self.stringify(value))
+            if statement["value"] is None:
+                print("")
+            else:
+                value = self.evaluate(statement["value"])
+                print(self.stringify(value))
         elif statement["type"] == "expression":
             self.evaluate(statement["expression"])
 
@@ -750,19 +756,15 @@ def main():
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("print 6")
+    # lex = Lexer("print;")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
     #     if token.type != TOKEN_TYPE.NONE:
     #         tokens.append(token)
-    # print(tokens)
     # par = Parser(tokens)
-    # for token in tokens:
-    #     expression = par.parse()
-    #     if expression:
-    #         print(expression)
+    # statements = par.parser()
+    # if statements:
     #     interpreter = Interpreter()
-    #     value = interpreter.evaluate(expression)
-    #     print(value)
+    #     interpreter.interpret(statements)
     main()
