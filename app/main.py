@@ -695,13 +695,26 @@ def main():
                     print(int(value))
                 else:
                     print(value)
+        elif command=="run":
+            lex = Lexer(file_contents)
+            tokens = []
+            while lex.i <= lex.size:
+                token = lex.next_token()
+                if token.type != TOKEN_TYPE.NONE:
+                    tokens.append(token)
+            par = Parser(tokens)
+            expression = par.parse()
+            for stmt in expression:
+                if stmt[0] == "print":
+                    interpreter = Interpreter()
+                    print(interpreter.evaluate(stmt[1]))
 
     if exit_code != 0:
         sys.exit(exit_code)  # Exit with error code
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("false <= (23 + 94)")
+    # lex = Lexer("print \"Hello, World!\"")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
