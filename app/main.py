@@ -344,6 +344,27 @@ class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens: list[Token] = tokens
         self.current = 0
+        
+    def parser(self):
+        statements = []
+        while not self.is_at_end():
+            statements.append(self.statement())
+        return statements
+
+    def statement(self):
+        if self.match(TOKEN_TYPE.PRINT):
+            return self.print_statement()
+        return self.expression_statement()
+
+    def print_statement(self):
+        value = self.expression()
+        self.consume(TOKEN_TYPE.SEMICOLON, "Expect ';' after value.")
+        return {"type": "print", "value": value}
+
+    def expression_statement(self):
+        expr = self.expression()
+        self.consume(TOKEN_TYPE.SEMICOLON, "Expect ';' after expression.")
+        return {"type": "expression", "expression": expr}
     def parse(self):
         return self.expression()
     def expression(self):
@@ -442,6 +463,25 @@ class Parser:
         return None
 
 class Interpreter:
+    def interpret(self, statements):
+        for statement in statements:
+            self.execute(statement)
+
+    def execute(self, statement):
+        if statement["type"] == "print":
+            value = self.evaluate(statement["value"])
+            print(self.stringify(value))
+        elif statement["type"] == "expression":
+            self.evaluate(statement["expression"])
+
+    def stringify(self, value):
+        if value is None:
+            return "nil"
+        if isinstance(value, bool):
+            return str(value).lower()
+        if isinstance(value, float) and value.is_integer():
+            return str(int(value))
+        return str(value)
     
     def evaluate(self, expression: str):
         """Evaluate a given expression with nested subexpressions."""
@@ -552,7 +592,6 @@ class Interpreter:
             else:
                 exit_code = 70
                 return ""
-
         def handle_arithmetic(left, operator, right):
             global exit_code
             if operator == "+":
@@ -568,7 +607,6 @@ class Interpreter:
             else:
                 exit_code = 70
                 return ""
-
         if isinstance(left, bool) and isinstance(right, bool):
             exit_code = 70
             return ""
@@ -651,7 +689,7 @@ def main():
         exit(1)
     command: str = sys.argv[1]
     filename: str = sys.argv[2]
-    commands = ["tokenize", "parse", "evaluate"]
+    commands = ["tokenize", "parse", "evaluate", "run"]
     if command not in commands:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
@@ -695,7 +733,7 @@ def main():
                     print(int(value))
                 else:
                     print(value)
-        elif command=="run":
+        elif command == "run":
             lex = Lexer(file_contents)
             tokens = []
             while lex.i <= lex.size:
@@ -703,29 +741,28 @@ def main():
                 if token.type != TOKEN_TYPE.NONE:
                     tokens.append(token)
             par = Parser(tokens)
-            expression = par.parse()
-            for stmt in expression:
-                if stmt[0] == "print":
-                    interpreter = Interpreter()
-                    print(interpreter.evaluate(stmt[1]))
-
+            statements = par.parser()
+            if statements:
+                interpreter = Interpreter()
+                interpreter.interpret(statements)
     if exit_code != 0:
         sys.exit(exit_code)  # Exit with error code
     # Default success exit
     sys.exit(0)
 if __name__ == "__main__":
-    # lex = Lexer("print \"Hello, World!\"")
+    # lex = Lexer("print 6")
     # tokens = []
     # while lex.i <= lex.size:
     #     token = lex.next_token()
     #     if token.type != TOKEN_TYPE.NONE:
     #         tokens.append(token)
+    # print(tokens)
     # par = Parser(tokens)
-    # expression = par.parse()
-    # if expression:
-    #     print(expression)
-    # interpreter = Interpreter()
-    # value = interpreter.evaluate(expression)
-    # print(value)
+    # for token in tokens:
+    #     expression = par.parse()
+    #     if expression:
+    #         print(expression)
+    #     interpreter = Interpreter()
+    #     value = interpreter.evaluate(expression)
+    #     print(value)
     main()
-        
