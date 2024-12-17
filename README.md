@@ -1,4 +1,3 @@
-[![progress-banner](https://backend.codecrafters.io/progress/interpreter/30397c9e-61af-4145-8459-be99ea11fc0a)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
 This is a starting point for Python solutions to the
 ["Build your own Interpreter" Challenge](https://app.codecrafters.io/courses/interpreter/overview).
